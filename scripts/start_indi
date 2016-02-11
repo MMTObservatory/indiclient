@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# MATCam connected via USB
-indiserver -v indi_sbig_ccd &> /home/sbig/matcam.log &
-
-# F/9 WFS camera connected via ethernet
-indiserver -v -p 7625 indi_sbig_ccd &> /home/sbig/f9wfs.log &
-sleep 5
-indi_setprop -p 7625 SBIG\ CCD.DEVICE_PORT_TYPE.Ethernet="On"
-indi_setprop -p 7625 SBIG\ CCD.IP_ADDRESS.IP=192.168.100.223
-
+# SBIG camera connected via USB
+cp -f /home/sbig/indi_sbig.log /home/sbig/indi_sbig.log.prev
+indiserver -v indi_sbig_ccd &> /home/sbig/indi_sbig.log &

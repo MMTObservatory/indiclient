@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# F/9 WFS camera connected via USB
+cp -f /home/sbig/f9wfs.log /home/sbig/f9wfs.log.prev
+indiserver -v indi_sbig_ccd &> /home/sbig/f9wfs.log &
+
+sleep 5
+
+/usr/local/bin/f9_cooling_on
+
+sleep 2
+
+/usr/local/bin/f9_wfs_config

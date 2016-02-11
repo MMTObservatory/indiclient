@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# MATCam SBIG camera connected via USB
+cp -f /home/sbig/matcam.log /home/sbig/matcam.log.prev
+indiserver -v indi_sbig_ccd &> /home/sbig/matcam.log &
