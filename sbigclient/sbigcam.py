@@ -31,6 +31,17 @@ class CCDCam(indiclient):
         self.defvectorlist = []
 
     @property
+    def ccd_info(self):
+        """
+        Get the CCD info about pixel sizes and bits per pixel, etc.
+        """
+        info_vec = self.get_vector(self.driver, "CCD_INFO")
+        info = {}
+        for e in info_vec.elements:
+            info[e.getName()] = e.get_float()
+        return info
+
+    @property
     def connected(self):
         """
         Check connection status and return True if connected, False otherwise.
@@ -41,6 +52,36 @@ class CCDCam(indiclient):
         else:
             return False
 
+    @property
+    def binning(self):
+        """
+        Get the X and Y binning that is currently set. Different cameras have different restrictions on how binning
+        can be set so configure the @setter on a per class basis.
+        """
+        bin_vec = self.get_vector(self.driver, "CCD_BINNING")
+        binning = {}
+        for e in bin_vec.elements:
+            binning[e.label] = e.get_int()
+        return binning
+
+    @property
+    def observer(self):
+        obs = self.get_text(self.driver, "FITS_HEADER", "FITS_OBSERVER")
+        return obs
+
+    @observer.setter
+    def observer(self, string):
+        o_vec = self.set_and_send_text(self.driver, "FITS_HEADER", "FITS_OBSERVER", string)
+
+    @property
+    def object(self):
+        obj = self.get_text(self.driver, "FITS_HEADER", "FITS_OBJECT")
+        return obj
+
+    @object.setter
+    def object(self, string):
+        o_vec = self.set_and_send_text(self.driver, "FITS_HEADER", "FITS_OBJECT", string)
+
     def connect(self):
         """
         Enable camera connection
@@ -48,13 +89,14 @@ class CCDCam(indiclient):
         vec = self.set_and_send_switchvector_by_elementlabel(self.driver, "CONNECTION", "Connect")
         if self.debug:
             vec.tell()
+        self.process_events()
         return vec
 
     def disconnect(self):
         """
         Disable camera connection
         """
-        vec = self.set_and_send_switchvector_by_elementlabel(self.driver, "CONNECTION", "Disonnect")
+        vec = self.set_and_send_switchvector_by_elementlabel(self.driver, "CONNECTION", "Disconnect")
         if self.debug:
             vec.tell()
         return vec
@@ -111,3 +153,124 @@ class MATCam(CCDCam):
     """
     def __init__(self, host="sbig-srv.mmto.arizona.edu", port=7624):
         super(MATCam, self).__init__(host, port, driver="SBIG CCD")
+        self.observer = "Mount Alignment Telescope"
+        self.process_events()
+
+
+class F9WFSCam(CCDCam):
+    """
+    Wrap CCDCam, set the driver to the SBIG driver, and point to the server for the F9WFS camera.
+    """
+    def __init__(self, host="sbig-srv.mmto.arizona.edu", port=7625):
+        super(F9WFSCam, self).__init__(host, port, driver="SBIG CCD")
+        self.observer = "F/9 WFS"
+        self.process_events()
+        self.wfs_config()
+
+    @property
+    def temperature(self):
+        t = self.get_float(self.driver, "CCD_TEMPERATURE", "CCD_TEMPERATURE_VALUE")
+        return t
+
+    @temperature.setter
+    def temperature(self, temp):
+        curr_t = self.get_float(self.driver, "CCD_TEMPERATURE", "CCD_TEMPERATURE_VALUE")
+        t_vec = self.set_and_send_float(self.driver, "CCD_TEMPERATURE", "CCD_TEMPERATURE_VALUE", temp)
+        if temp < curr_t:
+            self.cooling_on()
+        return t_vec
+
+    @property
+    def cooling_power(self):
+        power = self.get_float(self.driver, "CCD_COOLER_POWER", "CCD_COOLER_VALUE")
+        return power
+
+    @property
+    def cooler(self):
+        cooler = self.get_text(self.driver, "CCD_COOLER", "COOLER_ON")
+        return cooler
+
+    @property
+    def fan(self):
+        fan = self.get_text(self.driver, "CCD_FAN", "FAN_ON")
+        return fan
+
+    @property
+    def binning(self):
+        """
+        Get the X and Y binning that is currently set. Different cameras have different restrictions on how binning
+        can be set so configure the @setter on a per class basis.
+        """
+        bin_vec = self.get_vector(self.driver, "CCD_BINNING")
+        binning = {}
+        for e in bin_vec.elements:
+            binning[e.label] = e.get_int()
+        return binning
+
+    @binning.setter
+    def binning(self, bindict):
+        """
+        Set binning from a dict of form of e.g. {'X':2, 'Y':2}
+        """
+        if 'X' in bindict:
+            if bindict['X'] >= 1:
+                x_vec = self.set_and_send_float(self.driver, "CCD_BINNING", "HOR_BIN", int(bindict['X']))
+
+        if 'Y' in bindict:
+            if bindict['Y'] >= 1:
+                y_vec = self.set_and_send_float(self.driver, "CCD_BINNING", "VER_BIN", int(bindict['Y']))
+
+    def fan_on(self):
+        """
+        Turn the fan on (DISABLED due to bug in SBIG library)
+        """
+        #f_vec = self.set_and_send_switchvector_by_elementlabel(self.driver, "CCD_FAN", "On")
+        f_vec = None
+        return f_vec
+
+    def fan_off(self):
+        """
+        Turn the fan off (DISABLED due to bug in SBIG library)
+        """
+        #f_vec = self.set_and_send_switchvector_by_elementlabel(self.driver, "CCD_FAN", "Off")
+        f_vec = None
+        return f_vec
+
+    def cooling_on(self):
+        """
+        Turn the cooler on
+        """
+        c_vec = self.set_and_send_switchvector_by_elementlabel(self.driver, "CCD_COOLER", "On")
+        return c_vec
+
+    def cooling_off(self):
+        """
+        Turn the cooler off
+        """
+        c_vec = self.set_and_send_switchvector_by_elementlabel(self.driver, "CCD_COOLER", "Off")
+        return c_vec
+
+    def default_config(self):
+        """
+        Configure camera to full frame and 1x1 binning
+        """
+        self.binning = {"X": 1, "Y": 1}
+        ccdinfo = self.ccd_info
+        xl = self.set_and_send_float(self.driver, "CCD_FRAME", "X", 0)
+        yl = self.set_and_send_float(self.driver, "CCD_FRAME", "Y", 0)
+        xu = self.set_and_send_float(self.driver, "CCD_FRAME", "WIDTH", ccdinfo['CCD_MAX_X'])
+        yu = self.set_and_send_float(self.driver, "CCD_FRAME", "HEIGHT", ccdinfo['CCD_MAX_Y'])
+
+    def wfs_config(self):
+        """
+        Configure camera to be square with 3x3 binning for WFS imaging
+        """
+        self.binning = {"X": 3, "Y": 3}
+        ccdinfo = self.ccd_info
+        diff = ccdinfo['CCD_MAX_X'] - ccdinfo['CCD_MAX_Y']
+
+        # interestingly, the starting coords are in binned coords, but the width/height are unbinned
+        xl = self.set_and_send_float(self.driver, "CCD_FRAME", "X", int(diff/6))
+        yl = self.set_and_send_float(self.driver, "CCD_FRAME", "Y", 0)
+        xu = self.set_and_send_float(self.driver, "CCD_FRAME", "WIDTH", ccdinfo['CCD_MAX_Y'])
+        yu = self.set_and_send_float(self.driver, "CCD_FRAME", "HEIGHT", ccdinfo['CCD_MAX_Y'])
