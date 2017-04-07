@@ -85,6 +85,7 @@ class CCDCam(indiclient):
 
     @property
     def temperature(self):
+        self.process_events()
         t = self.get_float(self.driver, "CCD_TEMPERATURE", "CCD_TEMPERATURE_VALUE")
         return t
 
@@ -92,12 +93,11 @@ class CCDCam(indiclient):
     def temperature(self, temp):
         curr_t = self.get_float(self.driver, "CCD_TEMPERATURE", "CCD_TEMPERATURE_VALUE")
         t_vec = self.set_and_send_float(self.driver, "CCD_TEMPERATURE", "CCD_TEMPERATURE_VALUE", temp)
-        if temp < curr_t:
-            self.cooling_on()
-        return t_vec
+        self.process_events()
 
     @property
     def cooling_power(self):
+        self.process_events()
         power = self.get_float(self.driver, "CCD_COOLER_POWER", "CCD_COOLER_VALUE")
         return power
 
@@ -168,6 +168,7 @@ class CCDCam(indiclient):
         Turn the cooler on
         """
         c_vec = self.set_and_send_switchvector_by_elementlabel(self.driver, "CCD_COOLER", "On")
+        self.process_events()
         return c_vec
 
     def cooling_off(self):
@@ -175,6 +176,7 @@ class CCDCam(indiclient):
         Turn the cooler off
         """
         c_vec = self.set_and_send_switchvector_by_elementlabel(self.driver, "CCD_COOLER", "Off")
+        self.process_events()
         return c_vec
 
     def expose(self, exptime=1.0, exptype="Light"):
@@ -219,7 +221,7 @@ class RATCam(CCDCam):
     """
     Wrap CCDCam, set the driver to the SBIG driver, and point to the server for the RAT camera, a monochrome ST-IM
     """
-    def __init__(self, host="sbig-srv.mmto.arizona.edu", port=7624):
+    def __init__(self, host="ratcam.mmto.arizona.edu", port=7624):
         super(MATCam, self).__init__(host, port, driver="SBIG CCD")
         self.observer = "Rotator Alignment Telescope"
         self.process_events()
@@ -250,9 +252,10 @@ class RATCam(CCDCam):
 
 class MATCam(CCDCam):
     """
-    Wrap CCDCam, set the driver to the SBIG driver, and point to the server for the MAT camera, an ST-402 with BVR filters
+    Wrap CCDCam, set the driver to the SBIG driver, and point to the server to an ST-402 with BVR filters.
+    The specific camera is ID #06111391 and has Johnson BVR filters installed.  It is currently installed on the MAT.
     """
-    def __init__(self, host="sbig-srv.mmto.arizona.edu", port=7624):
+    def __init__(self, host="matcam.mmto.arizona.edu", port=7624):
         super(MATCam, self).__init__(host, port, driver="SBIG CCD")
         self.observer = "Mount Alignment Telescope"
         self.process_events()
@@ -270,7 +273,7 @@ class MATCam(CCDCam):
 
         # set filter labels
         for f in self.filters:
-            self.set_and_send_text(self.driver, "FILTER_NAME", "FILTER_SLOT_NAME_%d" % self.filters[f], f)
+            f_vec = self.set_and_send_text(self.driver, "FILTER_NAME", "FILTER_SLOT_NAME_%d" % self.filters[f], f)
 
     @property
     def filter(self):
@@ -287,20 +290,21 @@ class MATCam(CCDCam):
                 for k, i in self.filters.items():
                     if i == f:
                         self.object = k
-                self.set_and_send_float(self.driver, "FILTER_SLOT", "FILTER_SLOT_VALUE", f)
+                v = self.set_and_send_float(self.driver, "FILTER_SLOT", "FILTER_SLOT_VALUE", f)
         else:
             if f in self.filters:
                 self.object = f
-                self.set_and_send_float(self.driver, "FILTER_SLOT", "FILTER_SLOT_VALUE", self.filters[f])
+                v = self.set_and_send_float(self.driver, "FILTER_SLOT", "FILTER_SLOT_VALUE", self.filters[f])
 
     def enable_cfw(self):
         type_vec = self.set_and_send_switchvector_by_elementlabel(self.driver, "CFW_TYPE", "CFW-402")
         cfw_vec = self.set_and_send_switchvector_by_elementlabel(self.driver, "CFW_CONNECTION", "Connect")
-
+        self.process_events()
         return cfw_vec, type_vec
 
     def disable_cfw(self):
         cfw_vec = self.set_and_send_switchvector_by_elementlabel(self.driver, "CFW_CONNECTION", "Disconnect")
+        self.process_events()
         return cfw_vec
 
 
@@ -308,10 +312,18 @@ class F9WFSCam(CCDCam):
     """
     Wrap CCDCam, set the driver to the SBIG driver, and point to the server for the F9WFS camera.
     """
-    def __init__(self, host="sbig-srv.mmto.arizona.edu", port=7625):
+    def __init__(self, host="f9indi.mmto.arizona.edu", port=7624):
         super(F9WFSCam, self).__init__(host, port, driver="SBIG CCD")
-        self.observer = "F/9 WFS"
+        self.connect()
+        time.sleep(2)
         self.process_events()
+
+    def wfs_setup(self):
+        """
+        Configure camera for WFS use. Set observer and set up detector config
+        """
+        self.process_events()
+        self.observer = "F/9 WFS"
         self.wfs_config()
 
     def fan_on(self):
