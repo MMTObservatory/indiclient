@@ -1817,7 +1817,7 @@ def _sexagesimal(format, r):
     return output
 
 
-class bigindiclient:
+class bigindiclient(object):
     """
     @ivar socket  : a TCP/IP socket to communicate with the server
     @type socket  : socket.socket.socket
@@ -2520,7 +2520,6 @@ class indiclient(bigindiclient):
         @return: The vector containing the element that was just sent.
         @rtype: L{indivector}
         """
-        vector = self.get_vector(devicename, vectorname)
         vector = self.get_vector(devicename, vectorname)
         vector.get_element(elementname).set_float(number)
         self.send_vector(vector)
