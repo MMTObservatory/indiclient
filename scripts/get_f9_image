@@ -49,12 +49,19 @@ def main(args=None):
         parser.exit()
 
     cam = F9WFSCam()
+    cam.process_events()
+    cam.process_events()
+    cam.process_events()
+    cam.wfs_setup()
 
+    cam.process_events()
     fitsdata = cam.expose(exptime=args.exptime, exptype=args.exptype)
 
-    fitsdata.writeto(args.filename, clobber=False)
+    fitsdata.writeto(args.filename, clobber=True)
 
-
+    cam.disconnect()
+    cam.quit()
+    
 if __name__ == '__main__':
     # wrap main() with sys.exit() so that non-zero status code will be generated when exception raised
     sys.exit(main())
