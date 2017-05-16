@@ -1,0 +1,60 @@
+#!/usr/bin/env Python
+
+import argparse
+import sys
+
+from sbigclient.sbigcam import F9WFSCam
+
+
+def mkparser():
+    """
+    set up parser for command-line arguments
+    """
+    parser = argparse.ArgumentParser(description='command-line tool for grabbing images from the F/9 WFS SBIG camera')
+    parser.add_argument(
+        'exptime',
+        metavar='<exposure time (s)>',
+        type=float,
+        help="Exposure time for image in seconds"
+    )
+    parser.add_argument(
+        'filename',
+        metavar='<FITS filename>',
+        type=str,
+        help="Full path for filename to save image to"
+    )
+    parser.add_argument(
+        "--exptype",
+        metavar="<exposure type>",
+        default='Light',
+        choices=['Light', 'Dark', 'Flat', 'Bias'],
+        type=str,
+        help="Exposure type: Light, Dark, Flat, or Bias"
+    )
+
+    return parser
+
+
+def main(args=None):
+    """
+    main acquisition routine
+    """
+    parser = mkparser()
+    args = parser.parse_args(args)
+
+    # sanity check the inputs
+    if args.exptime < 0.1:
+        print("Must specify exposure time > 0.1 seconds.")
+        parser.print_usage()
+        parser.exit()
+
+    cam = F9WFSCam()
+
+    fitsdata = cam.expose(exptime=args.exptime, exptype=args.exptype)
+
+    fitsdata.writeto(args.filename, clobber=False)
+
+
+if __name__ == '__main__':
+    # wrap main() with sys.exit() so that non-zero status code will be generated when exception raised
+    sys.exit(main())

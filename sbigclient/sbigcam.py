@@ -315,7 +315,7 @@ class F9WFSCam(CCDCam):
     def __init__(self, host="f9indi.mmto.arizona.edu", port=7624):
         super(F9WFSCam, self).__init__(host, port, driver="SBIG CCD")
         self.connect()
-        time.sleep(2)
+        time.sleep(1)
         self.process_events()
 
     def wfs_setup(self):
