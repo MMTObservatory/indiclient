@@ -14,5 +14,4 @@ cam.cooling_off()
 cam.temperature = 10.0
 
 time.sleep(2)
-cam.disconnect()
 cam.quit()

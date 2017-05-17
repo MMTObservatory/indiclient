@@ -353,16 +353,21 @@ class F9WFSCam(CCDCam):
         xu = self.set_and_send_float(self.driver, "CCD_FRAME", "WIDTH", ccdinfo['CCD_MAX_X'])
         yu = self.set_and_send_float(self.driver, "CCD_FRAME", "HEIGHT", ccdinfo['CCD_MAX_Y'])
 
-    def wfs_config(self):
-        """
-        Configure camera to be square with 3x3 binning for WFS imaging
-        """
-        self.binning = {"X": 3, "Y": 3}
+    def wfs_subim(self):
         ccdinfo = self.ccd_info
         diff = ccdinfo['CCD_MAX_X'] - ccdinfo['CCD_MAX_Y']
+
+        binning = self.binning
 
         # interestingly, the starting coords are in binned coords, but the width/height are unbinned
         xl = self.set_and_send_float(self.driver, "CCD_FRAME", "X", int(diff/6))
         yl = self.set_and_send_float(self.driver, "CCD_FRAME", "Y", 0)
         xu = self.set_and_send_float(self.driver, "CCD_FRAME", "WIDTH", ccdinfo['CCD_MAX_Y'])
         yu = self.set_and_send_float(self.driver, "CCD_FRAME", "HEIGHT", ccdinfo['CCD_MAX_Y'])
+
+    def wfs_config(self):
+        """
+        Configure camera to be square with 3x3 binning for WFS imaging
+        """
+        self.binning = {"X": 3, "Y": 3}
+        self.wfs_subim()
