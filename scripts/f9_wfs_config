@@ -1,0 +1,21 @@
+#!/usr/bin/env python
+
+import time
+from sbigclient.sbigcam import F9WFSCam
+
+
+cam = F9WFSCam()
+
+cam.process_events()
+cam.process_events()
+cam.process_events()
+
+cam.wfs_setup()
+
+time.sleep(2)
+cam.process_events()
+cam.process_events()
+cam.wfs_config()
+cam.process_events()
+
+cam.quit()
