@@ -92,3 +92,6 @@ ENV/
 
 # emacs cruft
 *~
+
+# Mac cruft
+.DS_store
