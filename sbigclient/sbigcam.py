@@ -112,6 +112,40 @@ class CCDCam(indiclient):
         return fan
 
     @property
+    def filter(self):
+        slot = int(self.get_float(self.driver, "FILTER_SLOT", "FILTER_SLOT_VALUE"))
+        for k, i in self.filters.items():
+            if i == slot:
+                return k
+        return None
+
+    @property
+    def filters(self):
+        """
+        Return list of names of installed filters
+        """
+        filters = [e.get_text() for e in self.get_vector(self.driver, "FILTER_NAME").elements]
+        return filters
+
+    @property
+    def filter(self):
+        slot = int(self.get_float(self.driver, "FILTER_SLOT", "FILTER_SLOT_VALUE")) - 1  # filter slots 1-indexed
+        if slot >= 0 and slot < len(self.filters):
+            f = self.filters[slot]
+        else:
+            f = None
+        return f
+
+    @filter.setter
+    def filter(self, f):
+        if isinstance(f, int):
+            if f >= 0 and f < len(self.filters):
+                v = self.set_and_send_float(self.driver, "FILTER_SLOT", "FILTER_SLOT_VALUE", f+1)
+        else:
+            if f in self.filters:
+                v = self.set_and_send_float(self.driver, "FILTER_SLOT", "FILTER_SLOT_VALUE", self.filters.index(f)+1)
+
+    @property
     def binning(self):
         """
         Get the X and Y binning that is currently set. Different cameras have different restrictions on how binning
@@ -263,38 +297,6 @@ class MATCam(CCDCam):
         # enable filter wheel
         self.enable_cfw()
         time.sleep(1)
-
-        self.filters = {
-            'R': 1,
-            'V': 2,
-            'B': 3,
-            'Clear': 4
-        }
-
-        # set filter labels
-        for f in self.filters:
-            f_vec = self.set_and_send_text(self.driver, "FILTER_NAME", "FILTER_SLOT_NAME_%d" % self.filters[f], f)
-
-    @property
-    def filter(self):
-        slot = int(self.get_float(self.driver, "FILTER_SLOT", "FILTER_SLOT_VALUE"))
-        for k, i in self.filters.items():
-            if i == slot:
-                return k
-        return None
-
-    @filter.setter
-    def filter(self, f):
-        if isinstance(f, int):
-            if f >= 1 and f <= 4:
-                for k, i in self.filters.items():
-                    if i == f:
-                        self.object = k
-                v = self.set_and_send_float(self.driver, "FILTER_SLOT", "FILTER_SLOT_VALUE", f)
-        else:
-            if f in self.filters:
-                self.object = f
-                v = self.set_and_send_float(self.driver, "FILTER_SLOT", "FILTER_SLOT_VALUE", self.filters[f])
 
     def enable_cfw(self):
         type_vec = self.set_and_send_switchvector_by_elementlabel(self.driver, "CFW_TYPE", "CFW-402")
