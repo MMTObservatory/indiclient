@@ -2117,6 +2117,7 @@ class bigindiclient(object):
                 return v
             if ((time.time() - t) > self.timeout):
                 self.timeout_handler(devicename, vectorname, self)
+                return None
 
     def get_element(self, devicename, vectorname, elementname):
         """
