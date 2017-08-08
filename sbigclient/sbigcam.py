@@ -112,6 +112,11 @@ class CCDCam(indiclient):
         return fan
 
     @property
+    def frame_types(self):
+        types = [e.label for e in self.get_vector(self.driver, "CCD_FRAME_TYPE").elements]
+        return types
+
+    @property
     def filter(self):
         slot = int(self.get_float(self.driver, "FILTER_SLOT", "FILTER_SLOT_VALUE"))
         for k, i in self.filters.items():
@@ -217,8 +222,8 @@ class CCDCam(indiclient):
         """
         Take exposure and return FITS data
         """
-        if exptype not in ["Light", "Dark", "Bias", "Flat"]:
-            raise Exception("Invalid exposure type, %s. Must be one of 'Light', 'Dark', 'Bias', or 'Flat'." % exptype)
+        if exptype not in self.frame_types:
+            raise Exception("Invalid exposure type, %s. Must be one of %s'." % (exptype, repr(self.frame_types)))
 
         if exptime < 0.0 or exptime > 3600.0:
             raise Exception("Invalid exposure time, %f. Must be >= 0 and <= 3600 sec." % exptime)
