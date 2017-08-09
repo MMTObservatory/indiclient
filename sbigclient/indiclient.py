@@ -38,6 +38,11 @@ import math
 import zlib
 import time
 
+import logging
+import logging.handlers
+log = logging.getLogger("")
+log.setLevel(logging.INFO)
+
 import numpy as np
 
 
@@ -580,11 +585,11 @@ class indielement(indinamedobject):
 
     def tell(self):
         """
-        Prints all parameters of the object
+        Logs all parameters of the object
         @return: B{None}
         @rtype: NoneType
         """
-        print("   ", self.name, self.label, self.tag.get_type(), self._value)
+        log.info("INDIElement: %s %s %s %s" % (self.name, self.label, self.tag.get_type(), self._value))
 
     def get_text(self):
         """
@@ -700,7 +705,7 @@ class indinumber(indielement):
             except:
                 success = False
                 time.sleep(1)
-                print("INDI Warning: invalid float", self._value)
+                log.warning("INDI Warning: invalid float", self._value)
         return x
 
     def get_digits_after_point(self):
@@ -1103,11 +1108,11 @@ class indivector(indinamedobject):
 
     def tell(self):
         """"
-        Prints the most important parameters of the vector and its elements.
+        Logs the most important parameters of the vector and its elements.
         @return: B{None}
         @rtype: NoneType
         """
-        print(self.device, self.name, self.label, self.tag.get_type(), self._perm.get_text())
+        log.info("INDIVector: %s %s %s %s %s" % (self.device, self.name, self.label, self.tag.get_type(), self._perm.get_text()))
         for element in self.elements:
             element.tell()
 
@@ -1214,10 +1219,8 @@ class indivector(indinamedobject):
         self.timestamp = vector.timestamp
         self.timeout = vector.timeout
         self._light = vector._light
-        # print len(vector.elements), len(self.elements)
         for oe in vector.elements:
             for e in self.elements:
-                # print e.name,oe.name
                 if e.name == oe.name:
                     e.updateByElement(oe)
 
@@ -1240,7 +1243,7 @@ class indiswitchvector(indivector):
         self.rule = _normalize_whitespace(attrs.get('rule', ""))
 
     def tell(self):
-        print(self.device, self.name, self.label, self.tag.get_type(), self.rule)
+        log.info("INDISwitchVector: %s %s %s %s %s" % (self.device, self.name, self.label, self.tag.get_type(), self.rule))
         for element in self.elements:
             element.tell()
 
@@ -1374,11 +1377,11 @@ class indimessage(indiobject):
 
     def tell(self):
         """
-        print the message to the screen
+        Log the message to the screen
         @return: B{None}
         @rtype: NoneType
         """
-        print("    " + "INDImessage " + self.device + " " + self.get_text())
+        log.info("INDImessage: %s %s" % (self.device, self.get_text()))
 
     def get_text(self):
         """
@@ -1543,7 +1546,7 @@ class gui_indi_object_handler(_blocking_indi_object_handler):
         signal and finally call L{on_blocked}. This way we have generated a nasty loopback. But if we don't send the new state
         to the server and the change was caused by the user, the user will see the widget in the new state, but the server
         will not know about it, so the user has got another idea of the status of the system than the server and this is also
-        quite dangerous. For the moment we print a warning and send the signal to the server, so we use the solution that
+        quite dangerous. For the moment we log a warning and send the signal to the server, so we use the solution that
         might cause a loopback, but we make sure that the GUI and the server have got the same information about the status
         of the devices. One possible solution to this problem that causes neither of the problems is implemented in the
         L{gtkindiclient._comboboxentryhandler} class. We do no send the new state to the server. But we load the latest state
@@ -1554,8 +1557,8 @@ class gui_indi_object_handler(_blocking_indi_object_handler):
         @return: B{None}
         @rtype:  NoneType
         """
-        print("indiclient warning: signal received from GUI while changing gui element")
-        print("Danger of loopback!!!!")
+        log.warning("INDIClient warning: signal received from GUI while changing gui element")
+        log.warning("Danger of loopback!!!!")
         self.on_gui_changed(*args)
 
     def on_gui_changed(self, *args):
@@ -1823,7 +1826,7 @@ class bigindiclient(object):
     @type socket  : socket.socket.socket
     @ivar expat : an expat XML parser
     @type expat : xml.parsers.expat
-    @ivar verbose :  If C{True} all XML data will be printed to the screen
+    @ivar verbose :  If C{True} all XML data will be logged to the screen
     @type verbose : BooleanType
     @ivar currentMessage : The INDI message currently being processed by the XML parser
     @type currentMessage : L{indimessage}
@@ -1947,7 +1950,7 @@ class bigindiclient(object):
         @return: B{None}
         @rtype: NoneType
         """
-        print("resetting connection port")
+        log.info("Resetting connection port...")
         for i in range(10):
             time.sleep(0.1)
             self.receivetimer.cancel()
@@ -1970,9 +1973,9 @@ class bigindiclient(object):
                 self.socket.settimeout(0.01)
             except:
                 time.sleep(1)
-                print("Reconnecting")
+                log.info("Reconnecting...")
                 failed = True
-        print("connection reset successfully")
+        log.info("Connection reset successfully")
         self.receivetimer = threading.Timer(0.01, self._receiver)
         self.receivetimer.start()
 
@@ -1989,7 +1992,7 @@ class bigindiclient(object):
 
     def tell(self):
         """
-        prints all indivectors and their elements to the screen
+        Logs all indivectors and their elements to the screen
         @return: B{None}
         @rtype: NoneType"""
         for indivector in self.indivectors.list:
@@ -2078,7 +2081,6 @@ class bigindiclient(object):
             devicename = newVector.getDevice()
             vectorname = newVector.getName()
             got = False
-            # print vectorname
             for vector in self.indivectors.list:
                 if (devicename == vector.device) and (vectorname == vector.name):
                     vector.updateByVector(newVector)
@@ -2134,8 +2136,6 @@ class bigindiclient(object):
         @rtype: L{indielement}
         """
         vector = self.get_vector(devicename, vectorname)
-        # print "o",elementname
-        # vector.tell()
         for i, element in enumerate(vector.elements):
             if elementname == element.name:
                 return element
@@ -2225,7 +2225,7 @@ class bigindiclient(object):
         @return: B{None}
         @rtype: NoneType
         """
-        print("Timeout", devicename, vectorname)
+        log.warning("Timeout: ", devicename, vectorname)
         # raise Exception
         # self._receive()
 
@@ -2292,7 +2292,7 @@ class bigindiclient(object):
         @return: B{None}
         @rtype: NoneType
         """
-        print("got message by host :" + indi.host + " : ")
+        log.info("Got message by host: %s : " % indi.host)
         message.tell()
 
     def process_events(self):
@@ -2335,13 +2335,13 @@ class bigindiclient(object):
                             self.light_def_handler(vector, self)
                         self.defvectorlist.append(vector)
                 else:
-                    print("Received bogus INDIVector")
+                    log.warning("Received bogus INDIVector")
                     try:
                         vector.tell()
                         raise Exception
                         vector.tell()
                     except:
-                        print("Error printing bogus INDIVector")
+                        log.error("Error logging bogus INDIVector")
                         raise Exception
         except:
             a, b, c = sys.exc_info()
@@ -2360,7 +2360,7 @@ class bigindiclient(object):
             self.data = ""
         if self.data != "":
             if self.verbose:
-                print(self.data)
+                log.debug(self.data)
             self.expat.Parse(self.data, 0)
 
     def _char_data(self, data):
@@ -2434,7 +2434,6 @@ class bigindiclient(object):
             if obj.tag.get_transfertype() == inditransfertypes.idef:
                 self.currentVector = obj
             if obj.tag.get_transfertype() == inditransfertypes.iset:
-                # print name,attrs
                 self.currentVector = obj
                 # self._get_and_update_vector(attrs,obj.tag)
         if self.currentVector is not None:
@@ -2539,7 +2538,6 @@ class indiclient(bigindiclient):
         @return: The vector that that was just sent.
         @rtype: L{indivector}
         """
-        # print elementlabel
         vector = self.get_vector(devicename, vectorname)
         vector.set_by_elementlabel(elementlabel)
         self.send_vector(vector)

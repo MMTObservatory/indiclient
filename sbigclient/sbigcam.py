@@ -8,6 +8,11 @@ Classes and utility functions for communicating with SBIG cameras via the INDI p
 import time
 import io
 
+import logging
+import logging.handlers
+log = logging.getLogger("")
+log.setLevel(logging.INFO)
+
 from astropy.io import fits
 
 from .indiclient import indiclient
@@ -245,7 +250,7 @@ class CCDCam(indiclient):
             while self.receive_event_queue.empty() is False:
                 vector = self.receive_event_queue.get()
                 if vector.tag.get_type() == "BLOBVector":
-                    print("reading out...")
+                    log.info("Reading FITS image out...")
                     blob = vector.get_first_element()
                     if blob.get_plain_format() == ".fits":
                         buf = io.BytesIO(blob.get_data())
