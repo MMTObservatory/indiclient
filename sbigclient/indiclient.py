@@ -2225,9 +2225,7 @@ class bigindiclient(object):
         @return: B{None}
         @rtype: NoneType
         """
-        log.warning("Timeout: ", devicename, vectorname)
-        # raise Exception
-        # self._receive()
+        log.warning("Timeout: %s %s" % (devicename, vectorname))
 
     def set_timeout_handler(self, handler):
         """
