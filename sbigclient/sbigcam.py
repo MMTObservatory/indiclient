@@ -185,7 +185,7 @@ class CCDCam(indiclient):
         Enable camera connection
         """
         vec = self.set_and_send_switchvector_by_elementlabel(self.driver, "CONNECTION", "Connect")
-        if self.debug:
+        if self.debug and vec is not None:
             vec.tell()
         self.process_events()
         return vec
