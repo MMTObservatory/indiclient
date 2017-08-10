@@ -2210,7 +2210,7 @@ class bigindiclient(object):
         @return: B{None}
         @rtype: NoneType
         """
-        None
+        pass
 
     def _default_timeout_handler(self, devicename, vectorname, indi):
         """
@@ -2370,9 +2370,9 @@ class bigindiclient(object):
         @rtype: NoneType
         """
         if self.currentElement is None:
-            return
+            return None
         if self.currentVector is None:
-            return
+            return None
         self.currentData += [data]
 
     def _end_element(self, name):
@@ -2383,33 +2383,23 @@ class bigindiclient(object):
         @return: B{None}
         @rtype: NoneType
         """
-        if 1 == 1:
-            if self.currentVector is None:
-                return
-            self.currentVector.host = self.host
-            self.currentVector.port = self.port
-            if self.currentElement is not None:
-                if self.currentElement.tag.get_initial_tag() == name:
-                    self.currentData = "".join(self.currentData)
-                    self.currentData = self.currentData.replace('\\n', '')
-                    self.currentData = _normalize_whitespace(self.currentData)
+        if self.currentVector is None:
+            return None
+        self.currentVector.host = self.host
+        self.currentVector.port = self.port
+        if self.currentElement is not None:
+            if self.currentElement.tag.get_initial_tag() == name:
+                self.currentData = "".join(self.currentData)
+                self.currentData = self.currentData.replace('\\n', '')
+                self.currentData = _normalize_whitespace(self.currentData)
 
-                    self.currentElement._set_value(self.currentData)
-                    # if self.currentElement.tag.get_transfertype()==inditransfertypes.idef:
-                    self.currentVector.elements.append(self.currentElement)
-                    self.currentElement = None
-            if self.currentVector.tag.get_initial_tag() == name:
-                # if self.currentVector.is_valid():
-                # if self.currentVector.tag.get_transfertype()==inditransfertypes.idef:
-                # self.indivectors.append(self.currentVector)
-                self.receive_event_queue.put(copy.deepcopy(self.currentVector))
-                self.receive_vector_queue.put(copy.deepcopy(self.currentVector))
-                self.currentVector = None
-        """except:
-    a,b,c =sys.exc_info()
-    sys.excepthook(  a,b,c	)
-    raise Exception, "indiclient: Error during end element handler"
-    """
+                self.currentElement._set_value(self.currentData)
+                self.currentVector.elements.append(self.currentElement)
+                self.currentElement = None
+        if self.currentVector.tag.get_initial_tag() == name:
+            self.receive_event_queue.put(copy.deepcopy(self.currentVector))
+            self.receive_vector_queue.put(copy.deepcopy(self.currentVector))
+            self.currentVector = None
 
     def _start_element(self, name, attrs):
         """
@@ -2443,10 +2433,6 @@ class bigindiclient(object):
                     # self._get_and_update_element(attrs,obj.tag)
                 if obj.tag.is_element():
                     self.currentData = []
-        # except:
-        # a,b,c =sys.exc_info()
-        # sys.excepthook(  a,b,c )
-        # raise Exception, "indiclient: Error during start element handler"
 
     def enable_blob(self):
         """
@@ -2481,8 +2467,9 @@ class indiclient(bigindiclient):
         @rtype: L{indivector}
         """
         vector = self.get_vector(devicename, vectorname)
-        vector.get_element(elementname).set_text(text)
-        self.send_vector(vector)
+        if vector is not None:
+            vector.get_element(elementname).set_text(text)
+            self.send_vector(vector)
         return vector
 
     def set_and_send_bool(self, devicename, vectorname, elementname, state):
@@ -2500,8 +2487,9 @@ class indiclient(bigindiclient):
         @rtype: L{indivector}
         """
         vector = self.get_vector(devicename, vectorname)
-        vector.get_element(elementname).set_active(state)
-        self.send_vector(vector)
+        if vector is not None:
+            vector.get_element(elementname).set_active(state)
+            self.send_vector(vector)
         return vector
 
     def set_and_send_float(self, devicename, vectorname, elementname, number):
@@ -2519,8 +2507,9 @@ class indiclient(bigindiclient):
         @rtype: L{indivector}
         """
         vector = self.get_vector(devicename, vectorname)
-        vector.get_element(elementname).set_float(number)
-        self.send_vector(vector)
+        if vector is not None:
+            vector.get_element(elementname).set_float(number)
+            self.send_vector(vector)
         return vector
 
     def set_and_send_switchvector_by_elementlabel(self, devicename, vectorname, elementlabel):
@@ -2537,8 +2526,9 @@ class indiclient(bigindiclient):
         @rtype: L{indivector}
         """
         vector = self.get_vector(devicename, vectorname)
-        vector.set_by_elementlabel(elementlabel)
-        self.send_vector(vector)
+        if vector is not None:
+            vector.set_by_elementlabel(elementlabel)
+            self.send_vector(vector)
         return vector
 
     def get_float(self, devicename, vectorname, elementname):
@@ -2555,7 +2545,12 @@ class indiclient(bigindiclient):
         @rtype: FloatType
         """
         vector = self.get_vector(devicename, vectorname)
-        return vector.get_element(elementname).get_float()
+        try:
+            num = vector.get_element(elementname).get_float()
+        except Exception as e:
+            log.error("Can't get float from bogus vector: %s" % e)
+            num = None
+        return num
 
     def get_text(self, devicename, vectorname, elementname):
         """
@@ -2570,7 +2565,12 @@ class indiclient(bigindiclient):
         @rtype: StringType
         """
         vector = self.get_vector(devicename, vectorname)
-        return vector.get_element(elementname).get_text()
+        try:
+            text = vector.get_element(elementname).get_text()
+        except Exception as e:
+            log.error("Can't get text from bogus vector: %s" % e)
+            text = None
+        return text
 
     def get_bool(self, devicename, vectorname, elementname):
         """
@@ -2586,4 +2586,9 @@ class indiclient(bigindiclient):
         @rtype: BooleanType
         """
         vector = self.get_vector(devicename, vectorname)
-        return vector.get_element(elementname).get_active()
+        try:
+            bol = vector.get_element(elementname).get_active()
+        except Exception as e:
+            log.error("Can't get bool from bogus vector: %s" % e)
+            bol = None
+        return bol
