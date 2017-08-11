@@ -245,6 +245,9 @@ class CCDCam(indiclient):
         fitsdata = None
         run = True
 
+        t = time.time()
+        timeout = min(10., 2.*exptime)
+
         while run:
             self.process_receive_vector_queue()
             while self.receive_event_queue.empty() is False:
@@ -255,8 +258,14 @@ class CCDCam(indiclient):
                     if blob.get_plain_format() == ".fits":
                         buf = io.BytesIO(blob.get_data())
                         fitsdata = fits.open(buf)
+                        if 'FILTER' not in fitsdata[0].header:
+                            fitsdata[0].header['FILTER'] = self.filter
+                        fitsdata[0].header['CAMERA'] = "MATCam"
                     run = False
                     break
+            if ((time.time() - t) > timeout):
+                log.warning("Exposure timed out.")
+                break
             time.sleep(0.1)
         return fitsdata
 
@@ -301,11 +310,13 @@ class MATCam(CCDCam):
     """
     def __init__(self, host="matcam.mmto.arizona.edu", port=7624):
         super(MATCam, self).__init__(host, port, driver="SBIG CCD")
-        self.observer = "Mount Alignment Telescope"
-        self.process_events()
 
         # enable filter wheel
         self.enable_cfw()
+
+        self.observer = "Mount Alignment Telescope"
+        self.process_events()
+
         time.sleep(1)
 
     def enable_cfw(self):
