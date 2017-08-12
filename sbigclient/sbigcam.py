@@ -30,11 +30,12 @@ class CCDCam(indiclient):
         self.debug = debug
         if not self.connected:
             self.connect()
-            time.sleep(1)
+            time.sleep(2)
 
         # run this to clear any queued events
         self.process_events()
         self.defvectorlist = []
+        self.vector_dict = {v.name:v for v in self.indivectors.list}
 
     @property
     def ccd_info(self):
