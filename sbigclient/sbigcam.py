@@ -247,7 +247,7 @@ class CCDCam(indiclient):
         run = True
 
         t = time.time()
-        timeout = min(10., 2.*exptime)
+        timeout = exptime + 10.0
 
         while run:
             self.process_receive_vector_queue()
