@@ -2373,7 +2373,7 @@ class bigindiclient(object):
             return None
         if self.currentVector is None:
             return None
-        self.currentData += [data]
+        self.currentData += data
 
     def _end_element(self, name):
         """End of XML element handler for expat parser. For details (see
