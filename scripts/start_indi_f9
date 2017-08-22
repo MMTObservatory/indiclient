@@ -10,4 +10,8 @@ sleep 15
 
 sleep 5
 
+/usr/local/bin/f9_default_config
+
+sleep 5
+
 /usr/local/bin/f9_wfs_config
