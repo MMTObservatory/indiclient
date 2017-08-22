@@ -57,7 +57,7 @@ def main(args=None):
 
     fitsdata = cam.expose(exptime=args.exptime, exptype=args.exptype)
 
-    fitsdata.writeto(args.filename, clobber=True)
+    fitsdata.writeto(args.filename, overwrite=True)
 
     cam.quit()
     
