@@ -25,6 +25,7 @@ class CCDCam(indiclient):
     """
     def __init__(self, host, port, driver="CCD Simulator", debug=True):
         super(CCDCam, self).__init__(host, port)
+        self.camera_name = "MMT SBIG Default"
         self.enable_blob()
         self.driver = driver
         self.debug = debug
@@ -121,14 +122,6 @@ class CCDCam(indiclient):
     def frame_types(self):
         types = [e.label for e in self.get_vector(self.driver, "CCD_FRAME_TYPE").elements]
         return types
-
-    @property
-    def filter(self):
-        slot = int(self.get_float(self.driver, "FILTER_SLOT", "FILTER_SLOT_VALUE"))
-        for k, i in self.filters.items():
-            if i == slot:
-                return k
-        return None
 
     @property
     def filters(self):
@@ -261,7 +254,7 @@ class CCDCam(indiclient):
                         fitsdata = fits.open(buf)
                         if 'FILTER' not in fitsdata[0].header:
                             fitsdata[0].header['FILTER'] = self.filter
-                        fitsdata[0].header['CAMERA'] = "MATCam"
+                        fitsdata[0].header['CAMERA'] = self.camera_name
                     run = False
                     break
             if ((time.time() - t) > timeout):
@@ -278,6 +271,7 @@ class RATCam(CCDCam):
     def __init__(self, host="ratcam.mmto.arizona.edu", port=7624):
         super(MATCam, self).__init__(host, port, driver="SBIG CCD")
         self.observer = "Rotator Alignment Telescope"
+        self.camera_name = "RATcam"
         self.process_events()
 
     # turn off a bunch of functionality that doesn't apply to the ST-I series
@@ -316,6 +310,7 @@ class MATCam(CCDCam):
         self.enable_cfw()
 
         self.observer = "Mount Alignment Telescope"
+        self.camera_name = "MATcam"
         self.process_events()
 
         time.sleep(1)
@@ -338,9 +333,18 @@ class F9WFSCam(CCDCam):
     """
     def __init__(self, host="f9indi.mmto.arizona.edu", port=7624):
         super(F9WFSCam, self).__init__(host, port, driver="SBIG CCD")
+        self.camera_name = "F/9 WFS"
         self.connect()
         time.sleep(1)
         self.process_events()
+
+    @property
+    def filter(self):
+        return "N/A"
+
+    @filter.setter
+    def filter(self, f):
+        pass
 
     def wfs_setup(self):
         """
