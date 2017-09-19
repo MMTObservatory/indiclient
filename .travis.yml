@@ -97,15 +97,13 @@ matrix:
           env: NUMPY_VERSION=prerelease
                EVENT_TYPE='pull_request push cron'
 
-        # Do a PEP8 test with pycodestyle
-        - os: linux
-          env: MAIN_CMD='pycodestyle mmtcam --count' SETUP_CMD=''
-
     allow_failures:
         # Do a PEP8 test with pycodestyle
         # (allow to fail unless your code completely compliant)
         - os: linux
           env: MAIN_CMD='pycodestyle sbigcam --count' SETUP_CMD=''
+        - os: linux
+          env: MAIN_CMD='pycodestyle indiclient --count' SETUP_CMD=''
 
 install:
 
