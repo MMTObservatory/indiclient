@@ -257,6 +257,13 @@ class CCDCam(indiclient):
                         fitsdata[0].header['CAMERA'] = self.camera_name
                     run = False
                     break
+                if vector.tag.get_type() == "message":
+                    msg = vector.get_text()
+                    if "ERROR" in msg:
+                        log.error(msg)
+                        return None
+                    else:
+                        log.info(msg)
             if ((time.time() - t) > timeout):
                 log.warning("Exposure timed out.")
                 break
