@@ -261,7 +261,6 @@ class CCDCam(indiclient):
                     msg = vector.get_text()
                     if "ERROR" in msg:
                         log.error(msg)
-                        return None
                     else:
                         log.info(msg)
             if ((time.time() - t) > timeout):
