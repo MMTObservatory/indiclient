@@ -304,6 +304,20 @@ class RATCam(CCDCam):
         pass
 
 
+class SimCam(CCDCam):
+    """
+    The INDI CCD simulator device does not have a vector for cooling power. Set this sub-class up to work around that.
+    """
+    def __init__(self, host="localhost", port=7624):
+        super(SimCam, self).__init__(host, port, driver="CCD Simulator")
+        self.observer = "INDI CCD Simulator"
+        self.camera_name = "SimCam"
+
+    @property
+    def cooling_power(self):
+        return None
+
+
 class MATCam(CCDCam):
     """
     Wrap CCDCam, set the driver to the SBIG driver, and point to the server to an ST-402 with BVR filters.
