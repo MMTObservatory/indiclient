@@ -57,8 +57,6 @@ env:
 
     matrix:
         # Make sure that egg_info works without dependencies
-        - PYTHON_VERSION=2.7 SETUP_CMD='egg_info'
-        - PYTHON_VERSION=3.5 SETUP_CMD='egg_info'
         - PYTHON_VERSION=3.6 SETUP_CMD='egg_info'
 
 matrix:
@@ -80,15 +78,10 @@ matrix:
         #- os: linux
         #  env: SETUP_CMD='build_docs -w'
 
-        # Now try Astropy dev and LTS vesions with the latest 3.x and 2.7.
-        - os: linux
-          env: PYTHON_VERSION=2.7 ASTROPY_VERSION=development
-               EVENT_TYPE='pull_request push cron'
+        # Now try Astropy dev and LTS vesions with the latest 3.x
         - os: linux
           env: ASTROPY_VERSION=development
                EVENT_TYPE='pull_request push cron'
-        - os: linux
-          env: PYTHON_VERSION=2.7 ASTROPY_VERSION=lts
         - os: linux
           env: ASTROPY_VERSION=lts
 
