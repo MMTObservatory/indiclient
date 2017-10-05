@@ -191,10 +191,20 @@ class CCDCam(indiclient):
         }
         """
         ccdinfo = self.ccd_info
-        xl = self.set_and_send_float(self.driver, "CCD_FRAME", "X", int(framedict['X']))
-        yl = self.set_and_send_float(self.driver, "CCD_FRAME", "Y", int(framedict['Y']))
-        xu = self.set_and_send_float(self.driver, "CCD_FRAME", "WIDTH", int(framedict['width']))
-        yu = self.set_and_send_float(self.driver, "CCD_FRAME", "HEIGHT", int(framedict['height']))
+        if 'X' in framedict:
+            if framedict['X'] >= 0 and framedict['X'] <= ccdinfo['CCD_MAX_X']:
+                xl = self.set_and_send_float(self.driver, "CCD_FRAME", "X", int(framedict['X']))
+                if 'width' in framedict:
+                    newwidth = min(framedict['width'], ccdinfo['CCD_MAX_X']-framedict['X'])
+                    if newwidth >= 1:
+                        xu = self.set_and_send_float(self.driver, "CCD_FRAME", "WIDTH", int(newwidth))
+        if 'Y' in framedict:
+            if framedict['Y'] >= 0 and framedict['Y'] <= ccdinfo['CCD_MAX_Y']:
+                yl = self.set_and_send_float(self.driver, "CCD_FRAME", "Y", int(framedict['Y']))
+                if 'height' in framedict:
+                    newheight = min(framedict['height'], ccdinfo['CCD_MAX_Y']-framedict['Y'])
+                    if newheight >= 1:
+                        yu = self.set_and_send_float(self.driver, "CCD_FRAME", "HEIGHT", int(newheight))
 
     def connect(self):
         """
@@ -379,6 +389,10 @@ class F9WFSCam(CCDCam):
         self.connect()
         time.sleep(1)
         self.process_events()
+
+    @property
+    def filters(self):
+        return ["N/A"]
 
     @property
     def filter(self):
