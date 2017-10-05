@@ -61,18 +61,6 @@ class CCDCam(indiclient):
             return False
 
     @property
-    def binning(self):
-        """
-        Get the X and Y binning that is currently set. Different cameras have different restrictions on how binning
-        can be set so configure the @setter on a per class basis.
-        """
-        bin_vec = self.get_vector(self.driver, "CCD_BINNING")
-        binning = {}
-        for e in bin_vec.elements:
-            binning[e.label] = e.get_int()
-        return binning
-
-    @property
     def observer(self):
         obs = self.get_text(self.driver, "FITS_HEADER", "FITS_OBSERVER")
         return obs
@@ -173,6 +161,40 @@ class CCDCam(indiclient):
         if 'Y' in bindict:
             if bindict['Y'] >= 1:
                 y_vec = self.set_and_send_float(self.driver, "CCD_BINNING", "VER_BIN", int(bindict['Y']))
+
+    @property
+    def frame(self):
+        """
+        Get the frame configuration of the CCD: X lower, Y lower, width, and height
+        """
+        xl = self.get_float(self.driver, "CCD_FRAME", "X")
+        yl = self.get_float(self.driver, "CCD_FRAME", "Y")
+        xu = self.get_float(self.driver, "CCD_FRAME", "WIDTH")
+        yu = self.get_float(self.driver, "CCD_FRAME", "HEIGHT")
+        frame_info = {
+            'X': xl,
+            'Y': yl,
+            'width': xu,
+            'height': yu
+        }
+        return frame_info
+
+    @frame.setter
+    def frame(self, framedict):
+        """
+        Configure area of CCD to readout where framedict is of the form:
+        {
+            "X": int - lower X value of readout region
+            "Y": int - lower Y value of readout region
+            "width": int - width of the readout region
+            "height": int - height of the readout region
+        }
+        """
+        ccdinfo = self.ccd_info
+        xl = self.set_and_send_float(self.driver, "CCD_FRAME", "X", int(framedict['X']))
+        yl = self.set_and_send_float(self.driver, "CCD_FRAME", "Y", int(framedict['Y']))
+        xu = self.set_and_send_float(self.driver, "CCD_FRAME", "WIDTH", int(framedict['width']))
+        yu = self.set_and_send_float(self.driver, "CCD_FRAME", "HEIGHT", int(framedict['height']))
 
     def connect(self):
         """
@@ -396,10 +418,13 @@ class F9WFSCam(CCDCam):
         """
         self.binning = {"X": 1, "Y": 1}
         ccdinfo = self.ccd_info
-        xl = self.set_and_send_float(self.driver, "CCD_FRAME", "X", 0)
-        yl = self.set_and_send_float(self.driver, "CCD_FRAME", "Y", 0)
-        xu = self.set_and_send_float(self.driver, "CCD_FRAME", "WIDTH", ccdinfo['CCD_MAX_X'])
-        yu = self.set_and_send_float(self.driver, "CCD_FRAME", "HEIGHT", ccdinfo['CCD_MAX_Y'])
+        framedict = {
+            'X': 0,
+            'Y': 0,
+            'width': ccdinfo['CCD_MAX_X'],
+            'height': ccdinfo['CCD_MAX_Y']
+        }
+        self.frame = framedict
 
     def wfs_subim(self):
         ccdinfo = self.ccd_info
@@ -408,10 +433,13 @@ class F9WFSCam(CCDCam):
         binning = self.binning
 
         # interestingly, the starting coords are in binned coords, but the width/height are unbinned
-        xl = self.set_and_send_float(self.driver, "CCD_FRAME", "X", int(diff/6))
-        yl = self.set_and_send_float(self.driver, "CCD_FRAME", "Y", 0)
-        xu = self.set_and_send_float(self.driver, "CCD_FRAME", "WIDTH", ccdinfo['CCD_MAX_Y'])
-        yu = self.set_and_send_float(self.driver, "CCD_FRAME", "HEIGHT", ccdinfo['CCD_MAX_Y'])
+        framedict = {
+            'X': int(diff/6),
+            'Y': 0,
+            'width': ccdinfo['CCD_MAX_X'],
+            'height': ccdinfo['CCD_MAX_Y']
+        }
+        self.frame = framedict
 
     def wfs_config(self):
         """
