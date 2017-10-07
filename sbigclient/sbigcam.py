@@ -448,9 +448,9 @@ class F9WFSCam(CCDCam):
 
         # interestingly, the starting coords are in binned coords, but the width/height are unbinned
         framedict = {
-            'X': int(diff/6),
+            'X': int(diff/2),
             'Y': 0,
-            'width': ccdinfo['CCD_MAX_X'],
+            'width': ccdinfo['CCD_MAX_Y'],
             'height': ccdinfo['CCD_MAX_Y']
         }
         self.frame = framedict
@@ -459,5 +459,5 @@ class F9WFSCam(CCDCam):
         """
         Configure camera to be square with 3x3 binning for WFS imaging
         """
-        self.binning = {"X": 3, "Y": 3}
         self.wfs_subim()
+        self.binning = {"X": 3, "Y": 3}
