@@ -10,12 +10,13 @@ import io
 
 import logging
 import logging.handlers
-log = logging.getLogger("")
-log.setLevel(logging.INFO)
 
 from astropy.io import fits
 
 from .indiclient import indiclient
+
+log = logging.getLogger("")
+log.setLevel(logging.INFO)
 
 
 class CCDCam(indiclient):
@@ -36,7 +37,7 @@ class CCDCam(indiclient):
         # run this to clear any queued events
         self.process_events()
         self.defvectorlist = []
-        self.vector_dict = {v.name:v for v in self.indivectors.list}
+        self.vector_dict = {v.name: v for v in self.indivectors.list}
 
     @property
     def ccd_info(self):
@@ -210,7 +211,7 @@ class CCDCam(indiclient):
                     newheight = min(framedict['height'], ccdinfo['CCD_MAX_Y']-framedict['Y'])
                     if newheight >= 1:
                         yu = self.set_and_send_float(self.driver, "CCD_FRAME", "HEIGHT", int(newheight))
-                        log.info("Setting height to %d" int(newheight))
+                        log.info("Setting height to %d" % int(newheight))
 
     def connect(self):
         """
@@ -420,7 +421,7 @@ class F9WFSCam(CCDCam):
         """
         Turn the fan on (DISABLED due to bug in SBIG library)
         """
-        #f_vec = self.set_and_send_switchvector_by_elementlabel(self.driver, "CCD_FAN", "On")
+        # f_vec = self.set_and_send_switchvector_by_elementlabel(self.driver, "CCD_FAN", "On")
         f_vec = None
         return f_vec
 
@@ -428,7 +429,7 @@ class F9WFSCam(CCDCam):
         """
         Turn the fan off (DISABLED due to bug in SBIG library)
         """
-        #f_vec = self.set_and_send_switchvector_by_elementlabel(self.driver, "CCD_FAN", "Off")
+        # f_vec = self.set_and_send_switchvector_by_elementlabel(self.driver, "CCD_FAN", "Off")
         f_vec = None
         return f_vec
 
