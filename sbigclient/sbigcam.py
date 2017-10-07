@@ -157,10 +157,12 @@ class CCDCam(indiclient):
         if 'X' in bindict:
             if bindict['X'] >= 1:
                 x_vec = self.set_and_send_float(self.driver, "CCD_BINNING", "HOR_BIN", int(bindict['X']))
+                log.info("Setting X binning to %d" % int(bindict['X']))
 
         if 'Y' in bindict:
             if bindict['Y'] >= 1:
                 y_vec = self.set_and_send_float(self.driver, "CCD_BINNING", "VER_BIN", int(bindict['Y']))
+                log.info("Setting Y binning to %d" % int(bindict['Y']))
 
     @property
     def frame(self):
@@ -194,17 +196,21 @@ class CCDCam(indiclient):
         if 'X' in framedict:
             if framedict['X'] >= 0 and framedict['X'] <= ccdinfo['CCD_MAX_X']:
                 xl = self.set_and_send_float(self.driver, "CCD_FRAME", "X", int(framedict['X']))
+                log.info("Setting lower X to %d" % int(framedict['X']))
                 if 'width' in framedict:
                     newwidth = min(framedict['width'], ccdinfo['CCD_MAX_X']-framedict['X'])
                     if newwidth >= 1:
                         xu = self.set_and_send_float(self.driver, "CCD_FRAME", "WIDTH", int(newwidth))
+                        log.info("Setting width to %d" % int(newwidth))
         if 'Y' in framedict:
             if framedict['Y'] >= 0 and framedict['Y'] <= ccdinfo['CCD_MAX_Y']:
                 yl = self.set_and_send_float(self.driver, "CCD_FRAME", "Y", int(framedict['Y']))
+                log.info("Setting lower Y to %d" % int(framedict['Y']))
                 if 'height' in framedict:
                     newheight = min(framedict['height'], ccdinfo['CCD_MAX_Y']-framedict['Y'])
                     if newheight >= 1:
                         yu = self.set_and_send_float(self.driver, "CCD_FRAME", "HEIGHT", int(newheight))
+                        log.info("Setting height to %d" int(newheight))
 
     def connect(self):
         """
@@ -448,7 +454,7 @@ class F9WFSCam(CCDCam):
 
         # interestingly, the starting coords are in binned coords, but the width/height are unbinned
         framedict = {
-            'X': int(diff/2),
+            'X': int(diff/6),
             'Y': 0,
             'width': int(ccdinfo['CCD_MAX_Y']),
             'height': int(ccdinfo['CCD_MAX_Y'])
