@@ -4,14 +4,3 @@
 cp -f /home/sbig/f9wfs.log /home/sbig/f9wfs.log.prev
 indiserver -v indi_sbig_ccd &> /home/sbig/f9wfs.log &
 
-sleep 15
-
-/usr/local/bin/f9_cooling_on
-
-sleep 5
-
-/usr/local/bin/f9_default_config
-
-sleep 5
-
-/usr/local/bin/f9_wfs_config
