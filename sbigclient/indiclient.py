@@ -2357,7 +2357,6 @@ class bigindiclient(object):
         try:
             self.data = self.socket.recv(1000000)
         except Exception as e:
-            log.warning(f"Problem receiving data from socket: {e}")
             self.data = ""
         if self.data != "":
             if self.verbose:
