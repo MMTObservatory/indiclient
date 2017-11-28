@@ -33,17 +33,16 @@ import sys
 import os
 import threading
 import queue
-import copy
 import math
 import zlib
 import time
+
+import numpy as np
 
 import logging
 import logging.handlers
 log = logging.getLogger("")
 log.setLevel(logging.INFO)
-
-import numpy as np
 
 
 def _normalize_whitespace(text):
@@ -54,7 +53,8 @@ def _normalize_whitespace(text):
     @return: the input string with exactly one whitespace between each word and no tailing ones.
     @rtype: StringType
     """
-    return ' '.join(text.split())
+    trimmed = ' '.join(text.split())
+    return trimmed
 
 
 class _indinameconventions:
@@ -688,7 +688,8 @@ class indinumber(indielement):
     def _set_value(self, value):
         try:
             float(value)
-        except:
+        except Exception as e:
+            log.warning(f"Problem setting indinumber value: {e}")
             return
         indielement._set_value(self, value)
 
@@ -702,10 +703,10 @@ class indinumber(indielement):
             success = True
             try:
                 x = float(self._value)
-            except:
+            except Exception as e:
                 success = False
                 time.sleep(1)
-                log.warning("INDI Warning: invalid float", self._value)
+                log.warning(f"INDI Warning: invalid float {self._value} ({e})")
         return x
 
     def get_digits_after_point(self):
@@ -783,7 +784,8 @@ class indinumber(indielement):
             factor = 1.0 / pow(60, i)
             try:
                 val = val + float(sex[i]) * factor
-            except:
+            except Exception as e:
+                log.warning(f"Problem setting indinumber text: {e}")
                 error = True
         if not error:
             self.set_float(val)
@@ -1971,9 +1973,9 @@ class bigindiclient(object):
                 self.socket.connect((self.host, self.port))
                 self.socket.send("<getProperties version='1.5'/>".encode("utf8"))
                 self.socket.settimeout(0.01)
-            except:
+            except Exception as e:
                 time.sleep(1)
-                log.info("Reconnecting...")
+                log.warning(f"Connection attempt failed: {e}")
                 failed = True
         log.info("Connection reset successfully")
         self.receivetimer = threading.Timer(0.01, self._receiver)
@@ -2338,14 +2340,14 @@ class bigindiclient(object):
                         vector.tell()
                         raise Exception
                         vector.tell()
-                    except:
-                        log.error("Error logging bogus INDIVector")
+                    except Exception as e:
+                        log.error(f"Error logging bogus INDIVector: {e}")
                         raise Exception
-        except:
+        except Exception as e:
             a, b, c = sys.exc_info()
             sys.excepthook(a, b, c)
             self.quit()
-            raise Exception("indiclient: Error during process events")
+            raise Exception("indiclient: Error during process events: {e}")
 
     def _receive(self):
         """receive data from the server
@@ -2354,7 +2356,8 @@ class bigindiclient(object):
         """
         try:
             self.data = self.socket.recv(1000000)
-        except:
+        except Exception as e:
+            log.warning(f"Problem receiving data from socket: {e}")
             self.data = ""
         if self.data != "":
             if self.verbose:
@@ -2397,8 +2400,6 @@ class bigindiclient(object):
                 self.currentVector.elements.append(self.currentElement)
                 self.currentElement = None
         if self.currentVector.tag.get_initial_tag() == name:
-            # self.receive_event_queue.put(copy.deepcopy(self.currentVector))
-            # self.receive_vector_queue.put(copy.deepcopy(self.currentVector))
             self.receive_event_queue.put(self.currentVector)
             self.receive_vector_queue.put(self.currentVector)
             self.currentVector = None
