@@ -196,7 +196,7 @@ class _inditagfactory(_indinameconventions):
         """
         if tag in self.dict:
             inditag = self.dict[tag]
-            return copy.deepcopy(inditag)
+            return inditag
         else:
             return None
 
