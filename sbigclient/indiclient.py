@@ -689,7 +689,6 @@ class indinumber(indielement):
         try:
             float(value)
         except Exception as e:
-            log.warning(f"Problem setting indinumber value: {e}")
             return
         indielement._set_value(self, value)
 
