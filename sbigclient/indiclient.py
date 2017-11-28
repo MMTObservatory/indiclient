@@ -2397,8 +2397,10 @@ class bigindiclient(object):
                 self.currentVector.elements.append(self.currentElement)
                 self.currentElement = None
         if self.currentVector.tag.get_initial_tag() == name:
-            self.receive_event_queue.put(copy.deepcopy(self.currentVector))
-            self.receive_vector_queue.put(copy.deepcopy(self.currentVector))
+            # self.receive_event_queue.put(copy.deepcopy(self.currentVector))
+            # self.receive_vector_queue.put(copy.deepcopy(self.currentVector))
+            self.receive_event_queue.put(self.currentVector)
+            self.receive_vector_queue.put(self.currentVector)
             self.currentVector = None
 
     def _start_element(self, name, attrs):
