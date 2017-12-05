@@ -2042,7 +2042,7 @@ class bigindiclient(object):
         """
         self.running = True
         while self.running:
-            self._receive()
+            p = self._receive()
             while self.running_queue.empty() is False:
                 self.running = self.running_queue.get()
                 self.running_queue.task_done()
@@ -2364,6 +2364,9 @@ class bigindiclient(object):
             if self.verbose:
                 log.debug(self.data)
             parseval = self.expat.Parse(self.data, 0)
+        else:
+            parseval = None
+        return parseval
 
     def _char_data(self, data):
         """Char data handler for expat parser. For details (see
