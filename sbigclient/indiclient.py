@@ -2335,7 +2335,6 @@ class bigindiclient(object):
                         if vector.tag.get_type() == "LightVector":
                             self.light_def_handler(vector, self)
                         self.defvectorlist.append(vector)
-                self.receive_event_queue.task_done()
                 else:
                     log.warning("Received bogus INDIVector")
                     try:
@@ -2345,6 +2344,7 @@ class bigindiclient(object):
                     except Exception as e:
                         log.error(f"Error logging bogus INDIVector: {e}")
                         raise Exception
+                self.receive_event_queue.task_done()
         except Exception as e:
             a, b, c = sys.exc_info()
             sys.excepthook(a, b, c)
