@@ -2045,6 +2045,7 @@ class bigindiclient(object):
             self._receive()
             while self.running_queue.empty() is False:
                 self.running = self.running_queue.get()
+                self.running_queue.task_done()
 
     def send_vector(self, vector):
         """
@@ -2088,6 +2089,7 @@ class bigindiclient(object):
                     got = True
             if not got:
                 self.indivectors.list.append(newVector)
+            self.receive_vector_queue.task_done()
 
     def _get_vector(self, devicename, vectorname):
         for vector in self.indivectors.list:
@@ -2333,6 +2335,7 @@ class bigindiclient(object):
                         if vector.tag.get_type() == "LightVector":
                             self.light_def_handler(vector, self)
                         self.defvectorlist.append(vector)
+                self.receive_event_queue.task_done()
                 else:
                     log.warning("Received bogus INDIVector")
                     try:
@@ -2360,7 +2363,7 @@ class bigindiclient(object):
         if self.data != "":
             if self.verbose:
                 log.debug(self.data)
-            self.expat.Parse(self.data, 0)
+            parseval = self.expat.Parse(self.data, 0)
 
     def _char_data(self, data):
         """Char data handler for expat parser. For details (see
