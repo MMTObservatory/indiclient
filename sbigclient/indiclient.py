@@ -1181,8 +1181,8 @@ class indivector(indinamedobject):
         @rtype:  NoneType
         """
         checkinterval = 0.1
-        if (timeout / 1000.0) < checkinterval:
-            checkinterval = (timeout / 1000.0)
+        if timeout < checkinterval:
+            checkinterval = timeout
         self._wait_for_ok_general(checkinterval, timeout)
 
     def wait_for_ok(self):
@@ -1197,8 +1197,8 @@ class indivector(indinamedobject):
         else:
             timeout = float(self.timeout)
         checkinterval = 0.1
-        if (timeout / 1000.0) < checkinterval:
-            checkinterval = (timeout / 1000.0)
+        if timeout < checkinterval:
+            checkinterval = timeout
         self._wait_for_ok_general(checkinterval, timeout)
 
     def update(self, attrs, tag):
@@ -1894,7 +1894,6 @@ class bigindiclient(object):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.settimeout(2)
         self.socket.connect((host, port))
-        self.socket.settimeout(0.001)
         self.host = host
         self.port = port
         self.socket.send("<getProperties version='1.5'/>".encode("utf8"))
@@ -1971,13 +1970,12 @@ class bigindiclient(object):
                 self.socket.settimeout(0.1)
                 self.socket.connect((self.host, self.port))
                 self.socket.send("<getProperties version='1.5'/>".encode("utf8"))
-                self.socket.settimeout(0.01)
             except Exception as e:
                 time.sleep(1)
                 log.warning(f"Connection attempt failed: {e}")
                 failed = True
         log.info("Connection reset successfully")
-        self.receivetimer = threading.Timer(0.01, self._receiver)
+        self.receivetimer = threading.Timer(0.1, self._receiver)
         self.receivetimer.start()
 
     def quit(self):
