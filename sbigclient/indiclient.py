@@ -2355,13 +2355,13 @@ class bigindiclient(object):
         @rtype: NoneType
         """
         try:
-            self.data = self.socket.recv(1000000)
+            data = self.socket.recv(1000000)
         except Exception as e:
-            self.data = ""
-        if self.data != "":
+            data = ""
+        if data != "":
             if self.verbose:
-                log.debug(self.data)
-            parseval = self.expat.Parse(self.data, 0)
+                log.debug(data)
+            parseval = self.expat.Parse(data, 0)
         else:
             parseval = None
         return parseval
