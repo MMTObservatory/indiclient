@@ -2382,9 +2382,9 @@ class bigindiclient(object):
         self.currentVector.port = self.port
         if self.currentElement is not None:
             if self.currentElement.tag.get_initial_tag() == name:
-                self.currentData = "".join(self.currentData).replace('\\n', '').strip()
+                string_currentData = "".join(self.currentData).replace('\\n', '').strip()
 
-                self.currentElement._set_value(self.currentData)
+                self.currentElement._set_value(string_currentData)
                 self.currentVector.elements.append(self.currentElement)
                 self.currentElement = None
                 self.currentData = None
