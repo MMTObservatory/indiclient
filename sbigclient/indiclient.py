@@ -1878,7 +1878,7 @@ class bigindiclient(object):
         self.expat.StartElementHandler = self._start_element
         self.expat.EndElementHandler = self._end_element
         self.expat.CharacterDataHandler = self._char_data
-        self.expat.Parse('<?xml version="1.5" encoding="UTF-8"?> <doc>', 0)
+        self.expat.Parse('<?xml version="1.5" encoding="UTF-8"?>', 0)
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.settimeout(2)
         self.socket.connect((host, port))
