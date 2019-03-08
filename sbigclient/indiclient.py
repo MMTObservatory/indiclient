@@ -2411,20 +2411,13 @@ class bigindiclient(object):
             None
             self.receive_event_queue.put(indimessage(attrs))
         if obj.tag.is_vector():
-            if obj.tag.get_transfertype() == inditransfertypes.idef:
+            if obj.tag.get_transfertype() in (inditransfertypes.idef, inditransfertypes.iset):
                 self.currentVector = obj
-            if obj.tag.get_transfertype() == inditransfertypes.iset:
-                self.currentVector = obj
-                # self._get_and_update_vector(attrs,obj.tag)
         if self.currentVector is not None:
             if obj.tag.is_element():
-                if self.currentVector.tag.get_transfertype() == inditransfertypes.idef:
+                if self.currentVector.tag.get_transfertype() in (inditransfertypes.idef, inditransfertypes.iset):
                     self.currentElement = obj
-                if self.currentVector.tag.get_transfertype() == inditransfertypes.iset:
-                    self.currentElement = obj
-                    # self._get_and_update_element(attrs,obj.tag)
-                if obj.tag.is_element():
-                    self.currentData = []
+                self.currentData = []
 
     def enable_blob(self):
         """
