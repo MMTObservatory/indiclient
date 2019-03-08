@@ -2415,14 +2415,14 @@ class bigindiclient(object):
                 self.currentVector = obj
             if obj.tag.get_transfertype() == inditransfertypes.iset:
                 self.currentVector = obj
-                self._get_and_update_vector(attrs,obj.tag)
+                # self._get_and_update_vector(attrs,obj.tag)
         if self.currentVector is not None:
             if obj.tag.is_element():
                 if self.currentVector.tag.get_transfertype() == inditransfertypes.idef:
                     self.currentElement = obj
                 if self.currentVector.tag.get_transfertype() == inditransfertypes.iset:
                     self.currentElement = obj
-                    self._get_and_update_element(attrs,obj.tag)
+                    # self._get_and_update_element(attrs,obj.tag)
                 if obj.tag.is_element():
                     self.currentData = []
 
