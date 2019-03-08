@@ -45,18 +45,6 @@ log = logging.getLogger("")
 log.setLevel(logging.INFO)
 
 
-def _normalize_whitespace(text):
-    """
-    Remove redundant whitespace from a string
-    @param text: a string containing any unnecessary whitespaces
-    @type text: str
-    @return: the input string with exactly one whitespace between each word and no tailing ones.
-    @rtype: StringType
-    """
-    trimmed = ' '.join(text.split())
-    return trimmed
-
-
 class _indinameconventions:
     """
     The INDI naming scheme.
@@ -524,8 +512,8 @@ class indinamedobject(indiobject):
         @type attrs: DictType
         """
         indiobject.__init__(self, attrs, tag)
-        name = _normalize_whitespace(attrs.get('name', ""))
-        label = _normalize_whitespace(attrs.get('label', ""))
+        name = attrs.get('name', "").strip()
+        label = attrs.get('label', "").strip()
         self.name = name
         if label == "":
             self.label = name
@@ -633,10 +621,10 @@ class indinumber(indielement):
     def __init__(self, attrs, tag):
         self._value = ""
         indielement.__init__(self, attrs, tag)
-        self.format = _normalize_whitespace(attrs.get('format', ""))
-        self._min = _normalize_whitespace(attrs.get('min', ""))
-        self._max = _normalize_whitespace(attrs.get('max', ""))
-        self._step = _normalize_whitespace(attrs.get('step', ""))
+        self.format = attrs.get('format', "").strip()
+        self._min = attrs.get('min', "").strip()
+        self._max = attrs.get('max', "").strip()
+        self._step = attrs.get('step', "").strip()
 
     def get_min(self):
         """
@@ -810,7 +798,7 @@ class indilight(indielement):
         indielement.__init__(self, attrs, tag)
         if self.tag.is_vector():
             self._set_value("Alert")
-            self._set_value(_normalize_whitespace(attrs.get('state', "")))
+            self._set_value(attrs.get('state', "").strip())
             indielement.__init__(self, attrs, tag)
         if self.tag.is_element():
             indielement.__init__(self, attrs, tag)
@@ -870,7 +858,7 @@ class indilight(indielement):
     def update(self, attrs, tag):
         if self.tag.is_vectortag(tag):
             self._set_value("Alert")
-            self._set_value(_normalize_whitespace(attrs.get('state', "")))
+            self._set_value(attrs.get('state', "").strip())
             indielement.update(self, attrs, tag)
         if self.tag.is_elmenttag(tag):
             indielement.update(self, attrs, tag)
@@ -914,7 +902,7 @@ class indiblob(indielement):
 
     def __init__(self, attrs, tag):
         indielement.__init__(self, attrs, tag)
-        self.format = _normalize_whitespace(attrs.get('format', ""))
+        self.format = attrs.get('format', "").strip()
 
     def _get_decoded_value(self):
         """
@@ -1022,7 +1010,7 @@ class indiblob(indielement):
     def update(self, attrs, tag):
         self._check_writeable()
         indielement.update(self, attrs, tag)
-        self.format = _normalize_whitespace(attrs.get('format', ""))
+        self.format = attrs.get('format', "").strip()
 
     def get_xml(self, transfertype):
         tag = self.tag.get_xml(transfertype)
@@ -1074,12 +1062,12 @@ class indivector(indinamedobject):
         @type tag: L{indixmltag}
         """
         indinamedobject.__init__(self, attrs, tag)
-        self.device = _normalize_whitespace(attrs.get('device', ""))
-        self.timestamp = _normalize_whitespace(attrs.get('timestamp', ""))
-        self.timeout = _normalize_whitespace(attrs.get('timeout', ""))
+        self.device = attrs.get('device', "").strip()
+        self.timestamp = attrs.get('timestamp', "").strip()
+        self.timeout = attrs.get('timeout', "").strip()
         self._light = indilight(attrs, tag)
-        self.group = _normalize_whitespace(attrs.get('group', ""))
-        self._perm = indipermissions(_normalize_whitespace(attrs.get('perm', "")))
+        self.group = attrs.get('group', "").strip()
+        self._perm = indipermissions(attrs.get('perm', "").strip())
         if 'message' in attrs:
             self._message = indimessage(attrs)
         else:
@@ -1204,8 +1192,8 @@ class indivector(indinamedobject):
     def update(self, attrs, tag):
         indinamedobject.update(self, attrs, tag)
         self._check_writeable()
-        self.timestamp = _normalize_whitespace(attrs.get('timestamp', ""))
-        self.timeout = _normalize_whitespace(attrs.get('timeout', ""))
+        self.timestamp = attrs.get('timestamp', "").strip()
+        self.timeout = attrs.get('timeout', "").strip()
         self._light = indilight(attrs, tag)
 
     def get_xml(self, transfertype):
@@ -1241,7 +1229,7 @@ class indiswitchvector(indivector):
 
     def __init__(self, attrs, tag):
         indivector.__init__(self, attrs, tag)
-        self.rule = _normalize_whitespace(attrs.get('rule', ""))
+        self.rule = attrs.get('rule', "").strip()
 
     def tell(self):
         log.info("INDISwitchVector: %s %s %s %s %s" % (self.device, self.name, self.label, self.tag.get_type(), self.rule))
@@ -1372,9 +1360,9 @@ class indimessage(indiobject):
         """
         tag = indixmltag(False, False, True, None, inditransfertypes.inew)
         indiobject.__init__(self, attrs, tag)
-        self.device = _normalize_whitespace(attrs.get('device', ""))
-        self.timestamp = _normalize_whitespace(attrs.get('timestamp', ""))
-        self._value = _normalize_whitespace(attrs.get('message', ""))
+        self.device = attrs.get('device', "").strip()
+        self.timestamp = attrs.get('timestamp', "").strip()
+        self._value = attrs.get('message', "").strip()
 
     def tell(self):
         """
@@ -2008,8 +1996,8 @@ class bigindiclient(object):
         @return: B{None}
         @rtype: NoneType
         """
-        devicename = _normalize_whitespace(attrs.get('device', ""))
-        vectorname = _normalize_whitespace(attrs.get('name', ""))
+        devicename = attrs.get('device', "").strip()
+        vectorname = attrs.get('name', "").strip()
         for i, vector in enumerate(self.indivectors.list):
             if (devicename == vector.device) and (vectorname == vector.name):
                 vector.update(attrs, tag)
@@ -2028,7 +2016,7 @@ class bigindiclient(object):
         @rtype: NoneType
         """
         element = self.get_element(self.currentVector.device, self.currentVector.name,
-                                   _normalize_whitespace(attrs.get('name', "")))
+                                    attrs.get('name', "").strip())
         element.update(attrs, tag)
         return element
 
@@ -2395,8 +2383,7 @@ class bigindiclient(object):
         if self.currentElement is not None:
             if self.currentElement.tag.get_initial_tag() == name:
                 self.currentData = "".join(self.currentData)
-                self.currentData = self.currentData.replace('\\n', '')
-                self.currentData = _normalize_whitespace(self.currentData)
+                self.currentData = self.currentData.replace('\\n', '').strip()
 
                 self.currentElement._set_value(self.currentData)
                 self.currentVector.elements.append(self.currentElement)
