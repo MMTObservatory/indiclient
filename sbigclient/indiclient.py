@@ -2388,6 +2388,7 @@ class bigindiclient(object):
                 self.currentElement._set_value(self.currentData)
                 self.currentVector.elements.append(self.currentElement)
                 self.currentElement = None
+                self.currentData = None
         if self.currentVector.tag.get_initial_tag() == name:
             self.receive_event_queue.put(self.currentVector)
             self.receive_vector_queue.put(self.currentVector)
