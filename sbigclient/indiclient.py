@@ -2383,7 +2383,6 @@ class bigindiclient(object):
         if self.currentElement is not None:
             if self.currentElement.tag.get_initial_tag() == name:
                 string_currentData = "".join(self.currentData).replace('\\n', '').strip()
-
                 self.currentElement._set_value(string_currentData)
                 self.currentVector.elements.append(self.currentElement)
                 self.currentElement = None
@@ -2408,7 +2407,6 @@ class bigindiclient(object):
         if obj is None:
             return
         if 'message' in attrs:
-            None
             self.receive_event_queue.put(indimessage(attrs))
         if obj.tag.is_vector():
             if obj.tag.get_transfertype() in (inditransfertypes.idef, inditransfertypes.iset):
@@ -2417,7 +2415,7 @@ class bigindiclient(object):
             if obj.tag.is_element():
                 if self.currentVector.tag.get_transfertype() in (inditransfertypes.idef, inditransfertypes.iset):
                     self.currentElement = obj
-                self.currentData = []
+        self.currentData = []
 
     def enable_blob(self):
         """
