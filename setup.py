@@ -30,12 +30,12 @@ conf = ConfigParser()
 conf.read(['setup.cfg'])
 metadata = dict(conf.items('metadata'))
 
-PACKAGENAME = metadata.get('package_name', 'sbigclient')
-DESCRIPTION = metadata.get('description', 'Python-based INDI client for SBIG cameras')
+PACKAGENAME = metadata.get('package_name', 'indiclient')
+DESCRIPTION = metadata.get('description', 'Python-based INDI client utilities')
 AUTHOR = metadata.get('author', 'T. E. Pickering')
 AUTHOR_EMAIL = metadata.get('author_email', 'te.pickering@gmail.com')
 LICENSE = metadata.get('license', 'GPL3')
-URL = metadata.get('url', 'https://github.com/tepickering/sbigclient')
+URL = metadata.get('url', 'https://github.com/MMTObservatory/indiclient')
 
 # order of priority for long_description:
 #   (1) set in setup.cfg,

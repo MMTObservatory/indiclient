@@ -2,7 +2,7 @@
 # coding=utf-8
 
 """
-Classes and utility functions for communicating with SBIG cameras via the INDI protocol, http://www.indilib.org.
+Classes and utility functions for communicating with cameras via the INDI protocol, http://www.indilib.org.
 """
 
 import time
@@ -26,7 +26,7 @@ class CCDCam(indiclient):
     """
     def __init__(self, host, port, driver="CCD Simulator", debug=True):
         super(CCDCam, self).__init__(host, port)
-        self.camera_name = "MMT SBIG Default"
+        self.camera_name = "MMTO Default"
         self.enable_blob()
         self.driver = driver
         self.debug = debug

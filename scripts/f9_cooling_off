@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import time
-from sbigclient.sbigcam import F9WFSCam
+from indiclient.indicam import F9WFSCam
 
 
 cam = F9WFSCam()
