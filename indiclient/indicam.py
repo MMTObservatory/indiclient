@@ -364,6 +364,10 @@ class RATCam(CCDCam):
         return None
 
     @property
+    def filters(self):
+        return ["N/A"]
+
+    @property
     def filter(self):
         return "N/A"
 
