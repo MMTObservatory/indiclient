@@ -309,12 +309,39 @@ class CCDCam(indiclient):
         return fitsdata
 
 
+class ASICam(CCDCam):
+    """
+    Wrap CCDCam, set driver to ASI CCD, and point to localhost by default.
+    """
+    def __init__(self, host='localhost', port=7624):
+        super(ASICam, self).__init__(host, port, driver="ASI CCD")
+        self.camera_name = "ZWO ASI Camera"
+        self.process_events()
+
+    @property
+    def filters(self):
+        return ["N/A"]
+
+    @property
+    def filter(self):
+        return "N/A"
+
+    @filter.setter
+    def filter(self, f):
+        pass
+
+    @property
+    def gain(self):
+        self.process_events()
+        gain = self.get_float(self.driver, "CCD_CONTROLS", "Gain")
+        return gain
+
 class RATCam(CCDCam):
     """
     Wrap CCDCam, set the driver to the SBIG driver, and point to the server for the RAT camera, a monochrome ST-IM
     """
     def __init__(self, host="ratcam.mmto.arizona.edu", port=7624):
-        super(MATCam, self).__init__(host, port, driver="SBIG CCD")
+        super(RATCam, self).__init__(host, port, driver="SBIG CCD")
         self.observer = "Rotator Alignment Telescope"
         self.camera_name = "RATcam"
         self.process_events()
@@ -335,6 +362,14 @@ class RATCam(CCDCam):
     @property
     def fan(self):
         return None
+
+    @property
+    def filter(self):
+        return "N/A"
+
+    @filter.setter
+    def filter(self, f):
+        pass
 
     def cooling_on(self):
         pass
