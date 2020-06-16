@@ -676,7 +676,7 @@ class indinumber(indielement):
     def _set_value(self, value):
         try:
             float(value)
-        except Exception as e:
+        except Exception:
             return
         indielement._set_value(self, value)
 
@@ -2015,8 +2015,11 @@ class bigindiclient(object):
         @return: B{None}
         @rtype: NoneType
         """
-        element = self.get_element(self.currentVector.device, self.currentVector.name,
-                                    attrs.get('name', "").strip())
+        element = self.get_element(
+            self.currentVector.device,
+            self.currentVector.name,
+            attrs.get('name', "").strip()
+        )
         element.update(attrs, tag)
         return element
 
@@ -2028,7 +2031,7 @@ class bigindiclient(object):
         """
         self.running = True
         while self.running:
-            p = self._receive()
+            self._receive()
             while self.running_queue.empty() is False:
                 self.running = self.running_queue.get()
                 self.running_queue.task_done()
@@ -2331,7 +2334,7 @@ class bigindiclient(object):
                         log.error(f"Error logging bogus INDIVector: {e}")
                         raise Exception
                 self.receive_event_queue.task_done()
-        except Exception as e:
+        except Exception:
             a, b, c = sys.exc_info()
             sys.excepthook(a, b, c)
             self.quit()
@@ -2344,7 +2347,7 @@ class bigindiclient(object):
         """
         try:
             data = self.socket.recv(1000000)
-        except Exception as e:
+        except Exception:
             data = ""
         if data != "":
             if self.verbose:
