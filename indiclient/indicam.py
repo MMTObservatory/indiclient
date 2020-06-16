@@ -68,7 +68,7 @@ class CCDCam(indiclient):
 
     @observer.setter
     def observer(self, string):
-        o_vec = self.set_and_send_text(self.driver, "FITS_HEADER", "FITS_OBSERVER", string)
+        self.set_and_send_text(self.driver, "FITS_HEADER", "FITS_OBSERVER", string)
 
     @property
     def object(self):
@@ -77,7 +77,7 @@ class CCDCam(indiclient):
 
     @object.setter
     def object(self, string):
-        o_vec = self.set_and_send_text(self.driver, "FITS_HEADER", "FITS_OBJECT", string)
+        self.set_and_send_text(self.driver, "FITS_HEADER", "FITS_OBJECT", string)
 
     @property
     def temperature(self):
@@ -88,7 +88,8 @@ class CCDCam(indiclient):
     @temperature.setter
     def temperature(self, temp):
         curr_t = self.get_float(self.driver, "CCD_TEMPERATURE", "CCD_TEMPERATURE_VALUE")
-        t_vec = self.set_and_send_float(self.driver, "CCD_TEMPERATURE", "CCD_TEMPERATURE_VALUE", temp)
+        if temp != curr_t:
+            self.set_and_send_float(self.driver, "CCD_TEMPERATURE", "CCD_TEMPERATURE_VALUE", temp)
         self.process_events()
 
     @property
@@ -133,10 +134,10 @@ class CCDCam(indiclient):
     def filter(self, f):
         if isinstance(f, int):
             if f >= 0 and f < len(self.filters):
-                v = self.set_and_send_float(self.driver, "FILTER_SLOT", "FILTER_SLOT_VALUE", f+1)
+                self.set_and_send_float(self.driver, "FILTER_SLOT", "FILTER_SLOT_VALUE", f+1)
         else:
             if f in self.filters:
-                v = self.set_and_send_float(self.driver, "FILTER_SLOT", "FILTER_SLOT_VALUE", self.filters.index(f)+1)
+                self.set_and_send_float(self.driver, "FILTER_SLOT", "FILTER_SLOT_VALUE", self.filters.index(f)+1)
 
     @property
     def binning(self):
@@ -157,12 +158,12 @@ class CCDCam(indiclient):
         """
         if 'X' in bindict:
             if bindict['X'] >= 1:
-                x_vec = self.set_and_send_float(self.driver, "CCD_BINNING", "HOR_BIN", int(bindict['X']))
+                self.set_and_send_float(self.driver, "CCD_BINNING", "HOR_BIN", int(bindict['X']))
                 log.info("Setting X binning to %d" % int(bindict['X']))
 
         if 'Y' in bindict:
             if bindict['Y'] >= 1:
-                y_vec = self.set_and_send_float(self.driver, "CCD_BINNING", "VER_BIN", int(bindict['Y']))
+                self.set_and_send_float(self.driver, "CCD_BINNING", "VER_BIN", int(bindict['Y']))
                 log.info("Setting Y binning to %d" % int(bindict['Y']))
 
     @property
@@ -196,21 +197,21 @@ class CCDCam(indiclient):
         ccdinfo = self.ccd_info
         if 'X' in framedict:
             if framedict['X'] >= 0 and framedict['X'] <= ccdinfo['CCD_MAX_X']:
-                xl = self.set_and_send_float(self.driver, "CCD_FRAME", "X", int(framedict['X']))
+                self.set_and_send_float(self.driver, "CCD_FRAME", "X", int(framedict['X']))
                 log.info("Setting lower X to %d" % int(framedict['X']))
                 if 'width' in framedict:
                     newwidth = min(framedict['width'], ccdinfo['CCD_MAX_X']-framedict['X'])
                     if newwidth >= 1:
-                        xu = self.set_and_send_float(self.driver, "CCD_FRAME", "WIDTH", int(newwidth))
+                        self.set_and_send_float(self.driver, "CCD_FRAME", "WIDTH", int(newwidth))
                         log.info("Setting width to %d" % int(newwidth))
         if 'Y' in framedict:
             if framedict['Y'] >= 0 and framedict['Y'] <= ccdinfo['CCD_MAX_Y']:
-                yl = self.set_and_send_float(self.driver, "CCD_FRAME", "Y", int(framedict['Y']))
+                self.set_and_send_float(self.driver, "CCD_FRAME", "Y", int(framedict['Y']))
                 log.info("Setting lower Y to %d" % int(framedict['Y']))
                 if 'height' in framedict:
                     newheight = min(framedict['height'], ccdinfo['CCD_MAX_Y']-framedict['Y'])
                     if newheight >= 1:
-                        yu = self.set_and_send_float(self.driver, "CCD_FRAME", "HEIGHT", int(newheight))
+                        self.set_and_send_float(self.driver, "CCD_FRAME", "HEIGHT", int(newheight))
                         log.info("Setting height to %d" % int(newheight))
 
     def connect(self):
@@ -335,6 +336,7 @@ class ASICam(CCDCam):
         self.process_events()
         gain = self.get_float(self.driver, "CCD_CONTROLS", "Gain")
         return gain
+
 
 class RATCam(CCDCam):
     """
@@ -489,8 +491,6 @@ class F9WFSCam(CCDCam):
     def wfs_subim(self):
         ccdinfo = self.ccd_info
         diff = ccdinfo['CCD_MAX_X'] - ccdinfo['CCD_MAX_Y']
-
-        binning = self.binning
 
         # interestingly, the starting coords are in binned coords, but the width/height are unbinned
         framedict = {
