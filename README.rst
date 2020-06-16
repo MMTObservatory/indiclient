@@ -5,6 +5,13 @@ Python-based INDI client utilities
     :target: http://www.astropy.org
     :alt: Powered by Astropy Badge
 
+.. image:: https://github.com/MMTObservatory/indiclient/workflows/Python%20Tests/badge.svg
+    :target: https://github.com/MMTObservatory/indiclient/actions
+    :alt: Python Tests
+
+.. image:: https://codecov.io/gh/MMTObservatory/indiclient/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/MMTObservatory/indiclient
+    :alt: Codecov Status
 
 License
 -------
