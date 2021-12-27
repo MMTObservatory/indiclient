@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# SBIG camera connected via USB
+cp -f /home/pi/indi_pi.log /home/pi/indi_pi.log.prev
+indiserver -v indi_sbig_ccd &> /home/pi/indi_pi.log &
