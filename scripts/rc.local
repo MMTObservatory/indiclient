@@ -20,6 +20,9 @@ echo none > /sys/class/leds/led1/trigger
 sleep 1
 echo 0 > /sys/class/leds/led1/brightness
 
+# turn off bloody ethernet leds
+/home/sbig/lan951x-led-ctl/lan951x-led-ctl --fdx=0 --lnk=0 --spd=0
+
 su sbig /home/sbig/start_indi
 
 exit 0
