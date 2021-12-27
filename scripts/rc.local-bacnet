@@ -1,0 +1,28 @@
+#!/bin/sh -e
+#
+# rc.local
+#
+# This script is executed at the end of each multiuser runlevel.
+# Make sure that the script will "exit 0" on success or any other
+# value on error.
+#
+# In order to enable or disable this script just change the execution
+# bits.
+#
+# By default this script does nothing.
+
+# turn off green activity LED
+echo none > /sys/class/leds/led0/trigger
+echo 0 > /sys/class/leds/led0/brightness
+
+# turn off red power LED
+echo none > /sys/class/leds/led1/trigger
+sleep 1
+echo 0 > /sys/class/leds/led1/brightness
+
+# turn off bloody ethernet leds
+/home/pi/lan951x-led-ctl/lan951x-led-ctl --fdx=0 --lnk=0 --spd=0
+
+su pi /home/pi/start_indi
+
+exit 0
