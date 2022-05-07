@@ -915,11 +915,11 @@ class indiblob(indielement):
         value = self._value.encode("utf8")
         if len(self.format) >= 2:
             if self.format[len(self.format) - 2] + self.format[len(self.format) - 1] == ".z":
-                return zlib.decompress(base64.decodestring(value))
+                return zlib.decompress(base64.decodebytes(value))
             else:
-                return base64.decodestring(value)
+                return base64.decodebytes(value)
         else:
-            return base64.decodestring(value)
+            return base64.decodebytes(value)
 
     def _encode_and_set_value(self, value, format):
         """
