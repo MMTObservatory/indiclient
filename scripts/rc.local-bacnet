@@ -21,8 +21,8 @@ sleep 1
 echo 0 > /sys/class/leds/led1/brightness
 
 # turn off bloody ethernet leds
-/home/sbig/lan951x-led-ctl/lan951x-led-ctl --fdx=0 --lnk=0 --spd=0
+/home/pi/lan951x-led-ctl/lan951x-led-ctl --fdx=0 --lnk=0 --spd=0
 
-su sbig /home/sbig/start_indi
+su pi /home/pi/start_indi
 
 exit 0
