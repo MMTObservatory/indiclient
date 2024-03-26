@@ -1154,7 +1154,7 @@ class indivector(indinamedobject):
         @rtype: NoneType
         """
         t = time.time()
-        while not(self._light.is_ok()):
+        while not self._light.is_ok():
             time.sleep(checkinterval)
             if (time.time() - t) > timeout:
                 raise Exception("timeout waiting for state to turn Ok " +
