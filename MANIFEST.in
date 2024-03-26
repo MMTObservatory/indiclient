@@ -1,11 +1,9 @@
 include README.rst
 include pyproject.toml
-include setup.cfg
 
 recursive-include indiclient *.pyx *.c *.pxd
 recursive-include docs *
 recursive-include licenses *
-recursive-include cextern *
 recursive-include scripts *
 
 prune build

@@ -1,7 +1,95 @@
-[build-system]
+[project]
+name = "indiclient"
+dynamic = ["version"]
+authors = [
+    { name = "T. E. Pickering", email = "te.pickering@gmail.com"}
+]
+license = {file = "licenses/LICENSE.rst"}
+readme = "README.rst"
+description = "Python interface to INDI protocol"
+requires-python = ">=3.11"
+dependencies = [
+    "astropy",
+]
 
-requires = ["setuptools",
-            "setuptools_scm",
-            "wheel"]
+[project.optional-dependencies]
+test = [
+    "coverage",
+    "pytest-astropy",
+]
+docs = [
+    "sphinx-astropy",
+]
+
+[project.urls]
+Repository = "https://github.com/mmtobservatory/indiclient.git"
+Documentation = "https://indiclient.readthedocs.io/"
+
+[tool.setuptools]
+include-package-data = false
+
+[tool.setuptools.packages]
+find = {}
+
+[tool.setuptools_scm]
+version_file = "indiclient/version.py"
+
+[build-system]
+requires = [
+    "setuptools",
+    "setuptools_scm",
+]
 
 build-backend = 'setuptools.build_meta'
+
+[tool.pytest.ini_options]
+minversion = 7.0
+testpaths = [
+    "indiclient/test",
+]
+astropy_header = true
+doctest_plus = "enabled"
+text_file_format = "rst"
+addopts = [
+    "--color=yes",
+    "--doctest-rst",
+]
+xfail_strict = true
+filterwarnings = [
+    "error",
+    "ignore:numpy\\.ufunc size changed:RuntimeWarning",
+    "ignore:numpy\\.ndarray size changed:RuntimeWarning",
+    # Python 3.12 warning from dateutil imported by matplotlib
+    "ignore:.*utcfromtimestamp:DeprecationWarning",
+]
+
+[tool.coverage]
+
+    [tool.coverage.run]
+        omit = [
+            "indiclient/_astropy_init*",
+            "indiclient/conftest.py",
+            "indiclient/tests/*",
+            "indiclient/version*",
+            "*/indiclient/_astropy_init*",
+            "*/indiclient/conftest.py",
+            "*/indiclient/tests/*",
+            "*/indiclient/version*",
+        ]
+
+    [tool.coverage.report]
+        exclude_lines = [
+            # Have to re-enable the standard pragma
+            "pragma: no cover",
+            # Don't complain about packages we have installed
+            "except ImportError",
+            # Don't complain if tests don't hit defensive assertion code:
+            "raise AssertionError",
+            "raise NotImplementedError",
+            # Don't complain about script hooks
+            "'def main(.*):'",
+            # Ignore branches that don't pertain to this version of Python
+            "pragma: py{ignore_python_version}",
+            # Don't complain about IPython completion helper
+            "def _ipython_key_completions_",
+        ]

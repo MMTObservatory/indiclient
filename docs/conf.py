@@ -25,10 +25,10 @@
 # Thus, any C-extensions that are needed to build the documentation will *not*
 # be accessible, and the documentation will not build correctly.
 
-import os
 import sys
 import datetime
-from importlib import import_module
+
+from indiclient import __version__
 
 try:
     from sphinx_astropy.conf.v1 import *  # noqa
@@ -36,53 +36,27 @@ except ImportError:
     print('ERROR: the documentation requires the sphinx-astropy package to be installed')
     sys.exit(1)
 
-# Get configuration information from setup.cfg
-from configparser import ConfigParser
-conf = ConfigParser()
-
-conf.read([os.path.join(os.path.dirname(__file__), '..', 'setup.cfg')])
-setup_cfg = dict(conf.items('metadata'))
-
 # -- General configuration ----------------------------------------------------
 
 # By default, highlight as Python 3.
 highlight_language = 'python3'
 
-# If your documentation needs a minimal Sphinx version, state it here.
-#needs_sphinx = '1.2'
-
-# To perform a Sphinx version check that needs to be more specific than
-# major.minor, call `check_sphinx_version("x.y.z")` here.
-# check_sphinx_version("1.2.1")
-
-# List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files.
-exclude_patterns.append('_templates')
-
-# This is added to the end of RST files - a good place to put substitutions to
-# be used globally.
-rst_epilog += """
-"""
-
 # -- Project information ------------------------------------------------------
 
 # This does not *have* to match the package name, but typically does
-project = setup_cfg['name']
-author = setup_cfg['author']
+project = 'indiclient'
+author = "T. E. Pickering"
 copyright = '{0}, {1}'.format(
-    datetime.datetime.now().year, setup_cfg['author'])
+    datetime.datetime.now().year, author)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 
-import_module(setup_cfg['name'])
-package = sys.modules[setup_cfg['name']]
-
 # The short X.Y version.
-version = package.__version__.split('-', 1)[0]
+version = __version__.split('-', 1)[0]
 # The full version, including alpha/beta/rc tags.
-release = package.__version__
+release = __version__
 
 
 # -- Options for HTML output --------------------------------------------------
@@ -109,7 +83,7 @@ html_theme_options = {
     'logotext1': 'indiclient',  # white,  semi-bold
     'logotext2': '',  # orange, light
     'logotext3': ':docs'   # white,  light
-    }
+}
 
 
 # Custom sidebar templates, maps document names to template names.
@@ -151,44 +125,14 @@ latex_documents = [('index', project + '.tex', project + u' Documentation',
 man_pages = [('index', project.lower(), project + u' Documentation',
               [author], 1)]
 
-
-# -- Options for the edit_on_github extension ---------------------------------
-
-if setup_cfg.get('edit_on_github').lower() == 'true':
-
-    extensions += ['sphinx_astropy.ext.edit_on_github']
-
-    edit_on_github_project = setup_cfg['github_project']
-    edit_on_github_branch = "master"
-
-    edit_on_github_source_root = ""
-    edit_on_github_doc_root = "docs"
-
-# -- Resolving issue number to links in changelog -----------------------------
-github_issues_url = 'https://github.com/{0}/issues/'.format(setup_cfg['github_project'])
-
 # -- Turn on nitpicky mode for sphinx (to warn about references not found) ----
 #
-# nitpicky = True
-# nitpick_ignore = []
-#
-# Some warnings are impossible to suppress, and you can list specific references
-# that should be ignored in a nitpick-exceptions file which should be inside
-# the docs/ directory. The format of the file should be:
-#
-# <type> <class>
-#
-# for example:
-#
-# py:class astropy.io.votable.tree.Element
-# py:class astropy.io.votable.tree.SimpleElement
-# py:class astropy.io.votable.tree.SimpleElementWithContent
-#
-# Uncomment the following lines to enable the exceptions:
-#
-# for line in open('nitpick-exceptions'):
-#     if line.strip() == "" or line.startswith("#"):
-#         continue
-#     dtype, target = line.split(None, 1)
-#     target = target.strip()
-#     nitpick_ignore.append((dtype, six.u(target)))
+nitpicky = True
+
+# -- Options for linkcheck output -------------------------------------------
+linkcheck_retry = 5
+linkcheck_ignore = [
+    "https://www.aanda.org/",
+]
+linkcheck_timeout = 180
+linkcheck_anchors = False
