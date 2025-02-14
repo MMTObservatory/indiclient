@@ -95,7 +95,7 @@ def test_binning():
     cam = CCDCam("localhost", 7624)
     binning = cam.binning
     assert binning is not None
-    bindict = {'X': 2, 'Y': 2}
+    bindict = {"X": 2, "Y": 2}
     cam.binning = bindict
     assert cam.binning == bindict
     cam.quit()
@@ -108,12 +108,7 @@ def test_frame():
     cam = CCDCam("localhost", 7624)
     frame = cam.frame
     assert frame is not None
-    newframe = {
-        'X': 1,
-        'Y': 1,
-        'width': 100,
-        'height': 100
-    }
+    newframe = {"X": 1, "Y": 1, "width": 100, "height": 100}
     cam.frame = newframe
     assert cam.frame == newframe
     cam.quit()

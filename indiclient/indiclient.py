@@ -41,6 +41,7 @@ import numpy as np
 
 import logging
 import logging.handlers
+
 log = logging.getLogger("")
 log.setLevel(logging.INFO)
 
@@ -194,6 +195,7 @@ class inditransfertype:
     This is object is used to denote whether the an object was sent from the client to the server or vice versa and
     whether the object is just being defined or if it  was defined earlier.
     """
+
     None
 
 
@@ -201,8 +203,10 @@ class inditransfertypes(inditransfertype):
     """
     A Class containing the different transfer types
     """
+
     class inew(inditransfertype):
         """The object is send from the client to the server"""
+
         None
 
     class idef(inditransfertype):
@@ -211,6 +215,7 @@ class inditransfertypes(inditransfertype):
         Thus the server is just defining the object to the client. This corresponds to an C{def*} tag in the XML representation.
         Or  a client calling the C{IDDef*} function.
         """
+
         None
 
     class iset(inditransfertype):
@@ -219,6 +224,7 @@ class inditransfertypes(inditransfertype):
         Thus the server is just setting new value for an existing object to the client. This corresponds to an C{set*} tag
         in the XML representation. Or  a client calling the C{IDSet*}
         """
+
         None
 
 
@@ -363,7 +369,13 @@ class _indiobjectfactory(_indinameconventions):
         _indinameconventions.__init__(self)
         self.tagfactory = _inditagfactory()
         self.elementclasses = [inditext, indiswitch, indinumber, indiblob, indilight]
-        self.vectorclasses = [inditextvector, indiswitchvector, indinumbervector, indiblobvector, indilightvector]
+        self.vectorclasses = [
+            inditextvector,
+            indiswitchvector,
+            indinumbervector,
+            indiblobvector,
+            indilightvector,
+        ]
 
     def create(self, tag, attrs):
         """
@@ -413,7 +425,7 @@ class indipermissions:
         @return: C{True} is the object is readable, C{False} otherwise
         @rtype: BooleanType
         """
-        if (self.perm == "ro" or self.perm == "rw"):
+        if self.perm == "ro" or self.perm == "rw":
             return True
         else:
             return False
@@ -423,7 +435,7 @@ class indipermissions:
         @return: C{True} is the object is writable, C{False} otherwise
         @rtype: BooleanType
         """
-        if (self.perm == "wo" or self.perm == "rw"):
+        if self.perm == "wo" or self.perm == "rw":
             return True
         else:
             return False
@@ -442,7 +454,7 @@ class indipermissions:
 
 
 class indiobject:
-    """ The Base Class for INDI objects (so anything that INDI can send or receive )
+    """The Base Class for INDI objects (so anything that INDI can send or receive )
     @ivar tag: The XML tag of the INDI object (see L{indixmltag}).
     @type tag: L{indixmltag}
     """
@@ -512,8 +524,8 @@ class indinamedobject(indiobject):
         @type attrs: DictType
         """
         indiobject.__init__(self, attrs, tag)
-        name = attrs.get('name', "").strip()
-        label = attrs.get('label', "").strip()
+        name = attrs.get("name", "").strip()
+        label = attrs.get("label", "").strip()
         self.name = name
         if label == "":
             self.label = name
@@ -525,7 +537,7 @@ class indinamedobject(indiobject):
 
 
 class indielement(indinamedobject):
-    """ The Base Class of any element of an INDI Vector \n
+    """The Base Class of any element of an INDI Vector \n
     @ivar _value : The value of the INDI object. Meaning character contained between the end of the
             I{StartElement} and the beginning of the I{EndElement} in XML version. This may be coded in another format
             or compressed  and thus require some manipulation before it can be used.
@@ -536,7 +548,7 @@ class indielement(indinamedobject):
 
     def __init__(self, attrs, tag):
         indinamedobject.__init__(self, attrs, tag)
-        self._set_value('')
+        self._set_value("")
         self._old_value = self._value
 
     def _get_changed(self):
@@ -577,7 +589,10 @@ class indielement(indinamedobject):
         @return: B{None}
         @rtype: NoneType
         """
-        log.info("INDIElement: %s %s %s %s" % (self.name, self.label, self.tag.get_type(), self._value))
+        log.info(
+            "INDIElement: %s %s %s %s"
+            % (self.name, self.label, self.tag.get_type(), self._value)
+        )
 
     def get_text(self):
         """
@@ -598,7 +613,9 @@ class indielement(indinamedobject):
 
     def get_xml(self, transfertype):
         tag = self.tag.get_xml(transfertype)
-        data = "<" + tag + ' name="' + self.name + '"> ' + self._value + "</" + tag + "> "
+        data = (
+            "<" + tag + ' name="' + self.name + '"> ' + self._value + "</" + tag + "> "
+        )
         return data
 
     def updateByElement(self, element):
@@ -621,10 +638,10 @@ class indinumber(indielement):
     def __init__(self, attrs, tag):
         self._value = ""
         indielement.__init__(self, attrs, tag)
-        self.format = attrs.get('format', "").strip()
-        self._min = attrs.get('min', "").strip()
-        self._max = attrs.get('max', "").strip()
-        self._step = attrs.get('step', "").strip()
+        self.format = attrs.get("format", "").strip()
+        self._min = attrs.get("min", "").strip()
+        self._max = attrs.get("max", "").strip()
+        self._step = attrs.get("step", "").strip()
 
     def get_min(self):
         """
@@ -705,7 +722,7 @@ class indinumber(indielement):
         i = len(text) - 1
         while i >= 0:
             if text[i] == ".":
-                return (len(text) - i - 1)
+                return len(text) - i - 1
             i = i - 1
         return 0
 
@@ -733,14 +750,14 @@ class indinumber(indielement):
         @return: C{True} if the format property requires sexagesimal display
         @rtype: BooleanType
         """
-        return (not (-1 == self.format.find("m")))
+        return not (-1 == self.format.find("m"))
 
     def get_text(self):
         """
         @return: a formated string representation of it value
         @rtype:  StringType
         """
-        if (-1 == self.format.find("m")):
+        if -1 == self.format.find("m"):
             return self.format % self.get_float()
         else:
             return _sexagesimal(self.format, self.get_float())
@@ -798,7 +815,7 @@ class indilight(indielement):
         indielement.__init__(self, attrs, tag)
         if self.tag.is_vector():
             self._set_value("Alert")
-            self._set_value(attrs.get('state', "").strip())
+            self._set_value(attrs.get("state", "").strip())
             indielement.__init__(self, attrs, tag)
         if self.tag.is_element():
             indielement.__init__(self, attrs, tag)
@@ -858,7 +875,7 @@ class indilight(indielement):
     def update(self, attrs, tag):
         if self.tag.is_vectortag(tag):
             self._set_value("Alert")
-            self._set_value(attrs.get('state', "").strip())
+            self._set_value(attrs.get("state", "").strip())
             indielement.update(self, attrs, tag)
         if self.tag.is_elmenttag(tag):
             indielement.update(self, attrs, tag)
@@ -902,7 +919,7 @@ class indiblob(indielement):
 
     def __init__(self, attrs, tag):
         indielement.__init__(self, attrs, tag)
-        self.format = attrs.get('format', "").strip()
+        self.format = attrs.get("format", "").strip()
 
     def _get_decoded_value(self):
         """
@@ -914,7 +931,10 @@ class indiblob(indielement):
         """
         value = self._value.encode("utf8")
         if len(self.format) >= 2:
-            if self.format[len(self.format) - 2] + self.format[len(self.format) - 1] == ".z":
+            if (
+                self.format[len(self.format) - 2] + self.format[len(self.format) - 1]
+                == ".z"
+            ):
                 return zlib.decompress(base64.decodebytes(value))
             else:
                 return base64.decodebytes(value)
@@ -935,7 +955,10 @@ class indiblob(indielement):
         """
         self.format = format
         if len(self.format) >= 2:
-            if self.format[len(self.format) - 2] + self.format[len(self.format) - 1] == ".z":
+            if (
+                self.format[len(self.format) - 2] + self.format[len(self.format) - 1]
+                == ".z"
+            ):
                 self._set_value(base64.encodestring(zlib.compress(value)))
             else:
                 self._set_value(base64.encodestring(value))
@@ -948,7 +971,10 @@ class indiblob(indielement):
         @rtype: StringType
         """
         if len(self.format) >= 2:
-            if self.format[len(self.format) - 2] + self.format[len(self.format) - 1] == ".z":
+            if (
+                self.format[len(self.format) - 2] + self.format[len(self.format) - 1]
+                == ".z"
+            ):
                 return self.format.rstrip(".z")
             else:
                 return self.format
@@ -1010,11 +1036,21 @@ class indiblob(indielement):
     def update(self, attrs, tag):
         self._check_writeable()
         indielement.update(self, attrs, tag)
-        self.format = attrs.get('format', "").strip()
+        self.format = attrs.get("format", "").strip()
 
     def get_xml(self, transfertype):
         tag = self.tag.get_xml(transfertype)
-        data = "<" + tag + ' name="' + self.name + '" size="' + str(self.get_size()) + '" format="' + self.format + '"> '
+        data = (
+            "<"
+            + tag
+            + ' name="'
+            + self.name
+            + '" size="'
+            + str(self.get_size())
+            + '" format="'
+            + self.format
+            + '"> '
+        )
         data = data + self._value + "</" + tag + "> "
         return data
 
@@ -1062,13 +1098,13 @@ class indivector(indinamedobject):
         @type tag: L{indixmltag}
         """
         indinamedobject.__init__(self, attrs, tag)
-        self.device = attrs.get('device', "").strip()
-        self.timestamp = attrs.get('timestamp', "").strip()
-        self.timeout = attrs.get('timeout', "").strip()
+        self.device = attrs.get("device", "").strip()
+        self.timestamp = attrs.get("timestamp", "").strip()
+        self.timeout = attrs.get("timeout", "").strip()
         self._light = indilight(attrs, tag)
-        self.group = attrs.get('group', "").strip()
-        self._perm = indipermissions(attrs.get('perm', "").strip())
-        if 'message' in attrs:
+        self.group = attrs.get("group", "").strip()
+        self._perm = indipermissions(attrs.get("perm", "").strip())
+        if "message" in attrs:
             self._message = indimessage(attrs)
         else:
             self._message = None
@@ -1096,12 +1132,21 @@ class indivector(indinamedobject):
         return changed
 
     def tell(self):
-        """"
+        """ "
         Logs the most important parameters of the vector and its elements.
         @return: B{None}
         @rtype: NoneType
         """
-        log.info("INDIVector: %s %s %s %s %s" % (self.device, self.name, self.label, self.tag.get_type(), self._perm.get_text()))
+        log.info(
+            "INDIVector: %s %s %s %s %s"
+            % (
+                self.device,
+                self.name,
+                self.label,
+                self.tag.get_type(),
+                self._perm.get_text(),
+            )
+        )
         for element in self.elements:
             element.tell()
 
@@ -1157,9 +1202,17 @@ class indivector(indinamedobject):
         while not self._light.is_ok():
             time.sleep(checkinterval)
             if (time.time() - t) > timeout:
-                raise Exception("timeout waiting for state to turn Ok " +
-                                "devicename=" + self.device + " vectorname= " + self.name +
-                                " " + str(timeout) + " " + str(time.time() - t))
+                raise Exception(
+                    "timeout waiting for state to turn Ok "
+                    + "devicename="
+                    + self.device
+                    + " vectorname= "
+                    + self.name
+                    + " "
+                    + str(timeout)
+                    + " "
+                    + str(time.time() - t)
+                )
 
     def wait_for_ok_timeout(self, timeout):
         """
@@ -1192,8 +1245,8 @@ class indivector(indinamedobject):
     def update(self, attrs, tag):
         indinamedobject.update(self, attrs, tag)
         self._check_writeable()
-        self.timestamp = attrs.get('timestamp', "").strip()
-        self.timeout = attrs.get('timeout', "").strip()
+        self.timestamp = attrs.get("timestamp", "").strip()
+        self.timeout = attrs.get("timeout", "").strip()
         self._light = indilight(attrs, tag)
 
     def get_xml(self, transfertype):
@@ -1229,10 +1282,13 @@ class indiswitchvector(indivector):
 
     def __init__(self, attrs, tag):
         indivector.__init__(self, attrs, tag)
-        self.rule = attrs.get('rule', "").strip()
+        self.rule = attrs.get("rule", "").strip()
 
     def tell(self):
-        log.info("INDISwitchVector: %s %s %s %s %s" % (self.device, self.name, self.label, self.tag.get_type(), self.rule))
+        log.info(
+            "INDISwitchVector: %s %s %s %s %s"
+            % (self.device, self.name, self.label, self.tag.get_type(), self.rule)
+        )
         for element in self.elements:
             element.tell()
 
@@ -1316,11 +1372,11 @@ class indiswitchvector(indivector):
 
 
 class indinumbervector(indivector):
-    """A vector of numbers """
+    """A vector of numbers"""
 
 
 class indiblobvector(indivector):
-    """A vector of BLOBs """
+    """A vector of BLOBs"""
 
 
 class inditextvector(indivector):
@@ -1328,12 +1384,12 @@ class inditextvector(indivector):
 
 
 class indilightvector(indivector):
-    """A vector of lights """
+    """A vector of lights"""
 
     def __init__(self, attrs, tag):
         self.tag = tag
         newattrs = attrs.copy()
-        newattrs.update({"perm": 'ro'})
+        newattrs.update({"perm": "ro"})
         indivector.__init__(self, newattrs, self.tag)
 
     def update(self, attrs):
@@ -1360,9 +1416,9 @@ class indimessage(indiobject):
         """
         tag = indixmltag(False, False, True, None, inditransfertypes.inew)
         indiobject.__init__(self, attrs, tag)
-        self.device = attrs.get('device', "").strip()
-        self.timestamp = attrs.get('timestamp', "").strip()
-        self._value = attrs.get('message', "").strip()
+        self.device = attrs.get("device", "").strip()
+        self.timestamp = attrs.get("timestamp", "").strip()
+        self._value = attrs.get("message", "").strip()
 
     def tell(self):
         """
@@ -1388,8 +1444,9 @@ class indimessage(indiobject):
 
 
 class _indilist(list):
-    """" A list with a more sophisticated append() function.
-    It checks for the existence an object with the same name overwrites it, if there is one. Will become a dictionary  soon :-)"""
+    """ " A list with a more sophisticated append() function.
+    It checks for the existence an object with the same name overwrites it, if there is one. Will become a dictionary  soon :-)
+    """
 
     def __init__(self):
         self.list = []
@@ -1407,7 +1464,7 @@ class _indilist(list):
         while deleted == 1:
             deleted = 0
             for i, v in enumerate(self.list):
-                if (element.name == v.name):
+                if element.name == v.name:
                     del self.list[i]
                     deleted = 1
                     break
@@ -1452,7 +1509,7 @@ class _blocking_indi_object_handler:
         @return: C{True} if blocked , C{False} otherwise
         @rtype:  BooleanType
         """
-        return (self._blocked > 0)
+        return self._blocked > 0
 
     def indi_object_change_notify(self, *args):
         """
@@ -1546,7 +1603,9 @@ class gui_indi_object_handler(_blocking_indi_object_handler):
         @return: B{None}
         @rtype:  NoneType
         """
-        log.warning("INDIClient warning: signal received from GUI while changing gui element")
+        log.warning(
+            "INDIClient warning: signal received from GUI while changing gui element"
+        )
         log.warning("Danger of loopback!!!!")
         self.on_gui_changed(*args)
 
@@ -1695,7 +1754,9 @@ class indi_custom_element_handler(gui_indi_object_handler, indi_element_identifi
         @return: the L{indielement} this handler is associated with
         @rtype: L{indielement}
         """
-        return self.indi.get_vector(self.devicename, self.vectorname).get_element(self.elementname)
+        return self.indi.get_vector(self.devicename, self.vectorname).get_element(
+            self.elementname
+        )
 
 
 class mini_element_handler(indi_custom_element_handler):
@@ -1805,7 +1866,7 @@ def _sexagesimal(format, r):
     r -= float(min)
     r *= 60.0
     sec = r
-    output = '' + str(std) + ":" + str(min) + ":" + "%.2f" % sec
+    output = "" + str(std) + ":" + str(min) + ":" + "%.2f" % sec
     return output
 
 
@@ -1908,7 +1969,7 @@ class bigindiclient(object):
     # solution: add queue from indiclient to thread
 
     def _element_received(self, vector, element):
-        """ Called during the L{process_events} method each time an INDI element has been received
+        """Called during the L{process_events} method each time an INDI element has been received
         @param vector: The vector containing the element that has been received
         @type vector: indivector
         @param element:  The element that has been received
@@ -1917,19 +1978,24 @@ class bigindiclient(object):
         @rtype: NoneType
         """
         for handler in self.custom_element_handler_list:
-            if ((handler.vectorname == vector.name) and (handler.elementname == element.name) and
-                    (handler.devicename == vector.device)):
+            if (
+                (handler.vectorname == vector.name)
+                and (handler.elementname == element.name)
+                and (handler.devicename == vector.device)
+            ):
                 handler.indi_object_change_notify(vector, element)
 
     def _vector_received(self, vector):
-        """ Called during the L{process_events} method each time an indivector element has been received
+        """Called during the L{process_events} method each time an indivector element has been received
         @param vector: The vector that has been received
         @type vector: indivector
         @return: B{None}
         @rtype: NoneType
         """
         for handler in self.custom_vector_handler_list:
-            if ((handler.vectorname == vector.name) and (handler.devicename == vector.device)):
+            if (handler.vectorname == vector.name) and (
+                handler.devicename == vector.device
+            ):
                 handler.indi_object_change_notify(vector)
 
     def reset_connection(self):
@@ -1996,8 +2062,8 @@ class bigindiclient(object):
         @return: B{None}
         @rtype: NoneType
         """
-        devicename = attrs.get('device', "").strip()
-        vectorname = attrs.get('name', "").strip()
+        devicename = attrs.get("device", "").strip()
+        vectorname = attrs.get("name", "").strip()
         for i, vector in enumerate(self.indivectors.list):
             if (devicename == vector.device) and (vectorname == vector.name):
                 vector.update(attrs, tag)
@@ -2018,7 +2084,7 @@ class bigindiclient(object):
         element = self.get_element(
             self.currentVector.device,
             self.currentVector.name,
-            attrs.get('name', "").strip()
+            attrs.get("name", "").strip(),
         )
         element.update(attrs, tag)
         return element
@@ -2109,7 +2175,7 @@ class bigindiclient(object):
                     return v
             else:
                 return v
-            if ((time.time() - t) > self.timeout):
+            if (time.time() - t) > self.timeout:
                 self.timeout_handler(devicename, vectorname, self)
                 return None
 
@@ -2132,7 +2198,9 @@ class bigindiclient(object):
             if elementname == element.name:
                 return element
 
-    def add_mini_element_handler(self, devicename, vectorname, elementname, handlermethod):
+    def add_mini_element_handler(
+        self, devicename, vectorname, elementname, handlermethod
+    ):
         """
         Adds handler that will be called each time the element is received.
         Here the handler is a function that takes only one argument, namely the element that was
@@ -2149,7 +2217,9 @@ class bigindiclient(object):
         @return:  The handler object created
         @rtype: L{mini_element_handler}
         """
-        handler = mini_element_handler(devicename, vectorname, elementname, handlermethod)
+        handler = mini_element_handler(
+            devicename, vectorname, elementname, handlermethod
+        )
         return self.add_custom_element_handler(handler)
 
     def add_custom_element_handler(self, handler):
@@ -2232,8 +2302,14 @@ class bigindiclient(object):
         """
         self.timeout_handler = handler
 
-    def set_def_handlers(self, blob_def_handler, number_def_handler,
-                         switch_def_handler, text_def_handler, light_def_handler):
+    def set_def_handlers(
+        self,
+        blob_def_handler,
+        number_def_handler,
+        switch_def_handler,
+        text_def_handler,
+        light_def_handler,
+    ):
         """
         Sets new C{def} handlers.
         These will be called whenever an indivector was received with an C{def*Vector} tag. This
@@ -2310,7 +2386,9 @@ class bigindiclient(object):
                             self._element_received(vector, element)
                     if vector.tag.get_transfertype() == inditransfertypes.idef:
                         for vec in self.defvectorlist:
-                            if (vec.name == vector.name) and (vec.device == vector.device):
+                            if (vec.name == vector.name) and (
+                                vec.device == vector.device
+                            ):
                                 self.output_block = False
                                 return
                         if vector.tag.get_type() == "BLOBVector":
@@ -2385,7 +2463,9 @@ class bigindiclient(object):
         self.currentVector.port = self.port
         if self.currentElement is not None:
             if self.currentElement.tag.get_initial_tag() == name:
-                string_currentData = "".join(self.currentData).replace('\\n', '').strip()
+                string_currentData = (
+                    "".join(self.currentData).replace("\\n", "").strip()
+                )
                 self.currentElement._set_value(string_currentData)
                 self.currentVector.elements.append(self.currentElement)
                 self.currentElement = None
@@ -2409,14 +2489,20 @@ class bigindiclient(object):
         obj = self._factory.create(name, attrs)
         if obj is None:
             return
-        if 'message' in attrs:
+        if "message" in attrs:
             self.receive_event_queue.put(indimessage(attrs))
         if obj.tag.is_vector():
-            if obj.tag.get_transfertype() in (inditransfertypes.idef, inditransfertypes.iset):
+            if obj.tag.get_transfertype() in (
+                inditransfertypes.idef,
+                inditransfertypes.iset,
+            ):
                 self.currentVector = obj
         if self.currentVector is not None:
             if obj.tag.is_element():
-                if self.currentVector.tag.get_transfertype() in (inditransfertypes.idef, inditransfertypes.iset):
+                if self.currentVector.tag.get_transfertype() in (
+                    inditransfertypes.idef,
+                    inditransfertypes.iset,
+                ):
                     self.currentElement = obj
         self.currentData = []
 
@@ -2498,7 +2584,9 @@ class indiclient(bigindiclient):
             self.send_vector(vector)
         return vector
 
-    def set_and_send_switchvector_by_elementlabel(self, devicename, vectorname, elementlabel):
+    def set_and_send_switchvector_by_elementlabel(
+        self, devicename, vectorname, elementlabel
+    ):
         """
         Sets all L{indiswitch} elements in this vector to C{Off}. And sets the one matching the given L{elementlabel}
         to C{On}
