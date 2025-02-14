@@ -7,7 +7,7 @@ name: Python Tests
 on:
   push:
     branches:
-      - main
+      - master
     tags:
       - '*'
   pull_request:
@@ -31,12 +31,12 @@ jobs:
         - name: Codestyle
           linux: codestyle
 
-        - name: Python 3.12 on Linux with all dependencies, remote data, and coverage
-          linux: py312-test-cov
+        - name: Python 3.13 on Linux with all dependencies, remote data, and coverage
+          linux: py313-test-cov
           coverage: codecov
           toxargs: -v
           posargs: --remote-data=any
 
         - name: (Allowed Failure) Python 3.12 on Linux with dev dependencies
-          linux: py312-test-astropydev
+          linux: py313-test-astropydev
           toxargs: -v
