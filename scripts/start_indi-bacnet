@@ -1,5 +1,25 @@
 #!/bin/bash
 
-# SBIG camera connected via USB
+# SBIG camera and ZWO camera+EFW connected via USB
 cp -f /home/pi/indi_pi.log /home/pi/indi_pi.log.prev
-indiserver -v indi_sbig_ccd &> /home/pi/indi_pi.log &
+indiserver -v indi_sbig_ccd indi_asi_ccd indi_asi_wheel &> /home/pi/indi_pi.log &
+sleep 3
+indi_setprop "SBIG CCD.CONNECTION.CONNECT=On"
+sleep 1
+indi_setprop "SBIG CCD.CCD_FRAME.X=137;Y=0;WIDTH=2535;HEIGHT=2535"
+indi_setprop "SBIG CCD.CCD_BINNING.HOR_BIN=3;VER_BIN=3"
+sleep 3
+# for some reason the first setting doesn't take effect
+indi_setprop "SBIG CCD.CCD_FRAME.X=137;Y=0;WIDTH=2535;HEIGHT=2535"
+indi_setprop "SBIG CCD.CCD_BINNING.HOR_BIN=3;VER_BIN=3"
+
+# configure the ZWO camera
+indi_setprop "ASI EFW.CONNECTION.CONNECT=On"
+indi_setprop "ZWO CCD ASI1600MM Pro.CONNECTION.CONNECT=On"
+sleep 2
+indi_setprop "ZWO CCD ASI1600MM Pro.CCD_FRAME.X=400;Y=1000;WIDTH=2800;HEIGHT=2800"
+indi_setprop "ZWO CCD ASI1600MM Pro.CCD_BINNING.HOR_BIN=4;VER_BIN=4"
+# somehow need to set again to get it to apply the size properly
+sleep 2
+indi_setprop "ZWO CCD ASI1600MM Pro.CCD_FRAME.X=400;Y=1000;WIDTH=2800;HEIGHT=2800"
+indi_setprop "ZWO CCD ASI1600MM Pro.CCD_BINNING.HOR_BIN=4;VER_BIN=4"
