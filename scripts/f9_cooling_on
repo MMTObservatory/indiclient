@@ -1,20 +1,4 @@
-#!/usr/bin/env python
+#!/bin/bash
 
-import time
-from indiclient.indicam import F9WFSCam
-
-
-cam = F9WFSCam()
-
-cam.process_events()
-cam.process_events()
-cam.process_events()
-
-cam.cooling_on()
-cam.temperature = -15.0
-
-time.sleep(2)
-cam.process_events()
-cam.process_events()
-
-cam.quit()
+indi_setprop "SBIG CCD.CCD_COOLER.COOLER_ON=On"
+indi_setprop "ZWO CCD ASI1600MM Pro.CCD_TEMPERATURE.CCD_TEMPERATURE_VALUE=-5.0"
