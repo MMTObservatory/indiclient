@@ -5,9 +5,9 @@ authors = [
     { name = "T. E. Pickering", email = "te.pickering@gmail.com"}
 ]
 license = {file = "licenses/LICENSE.rst"}
-readme = "README.rst"
+readme = "README.md"
 description = "Python interface to INDI protocol"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
     "astropy",
 ]

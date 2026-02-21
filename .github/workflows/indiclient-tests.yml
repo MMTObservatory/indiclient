@@ -11,6 +11,7 @@ on:
     tags:
       - '*'
   pull_request:
+    types: [opened, synchronize, reopened]
   schedule:
     # run every Monday at 6am UTC
     - cron: '0 6 * * 1'
@@ -31,12 +32,16 @@ jobs:
         - name: Codestyle
           linux: codestyle
 
-        - name: Python 3.13 on Linux with all dependencies, remote data, and coverage
-          linux: py313-test-cov
+        - name: Python 3.14 on Linux with all dependencies, remote data, and coverage
+          linux: py314-test-cov
           coverage: codecov
           toxargs: -v
           posargs: --remote-data=any
 
-        - name: (Allowed Failure) Python 3.12 on Linux with dev dependencies
-          linux: py313-test-astropydev
+        - name: Python 3.13 on Linux with all dependencies
+          linux: py313-test
+          toxargs: -v
+
+        - name: (Allowed Failure) Python 3.14 on Linux with dev dependencies
+          linux: py314-test-astropydev
           toxargs: -v

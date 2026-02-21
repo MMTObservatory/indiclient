@@ -1,30 +1,18 @@
-Python-based INDI client utilities
-----------------------------------
+# Python-based INDI client utilities
 
-.. image:: http://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat
-    :target: http://www.astropy.org
-    :alt: Powered by Astropy Badge
+[![Powered by Astropy](http://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat)](http://www.astropy.org)
+[![Python Tests](https://github.com/MMTObservatory/indiclient/workflows/Python%20Tests/badge.svg)](https://github.com/MMTObservatory/indiclient/actions)
+[![Codecov Status](https://codecov.io/gh/MMTObservatory/indiclient/branch/master/graph/badge.svg)](https://codecov.io/gh/MMTObservatory/indiclient)
 
-.. image:: https://github.com/MMTObservatory/indiclient/workflows/Python%20Tests/badge.svg
-    :target: https://github.com/MMTObservatory/indiclient/actions
-    :alt: Python Tests
-
-.. image:: https://codecov.io/gh/MMTObservatory/indiclient/branch/master/graph/badge.svg
-    :target: https://codecov.io/gh/MMTObservatory/indiclient
-    :alt: Codecov Status
-
-License
--------
+## License
 
 This project is Copyright (c) T. E. Pickering (MMT Observatory) and licensed under
 the terms of the BSD 3-Clause license. This package is based upon
-the `Astropy package template <https://github.com/astropy/package-template>`_
+the [Astropy package template](https://github.com/astropy/package-template)
 which is licensed under the BSD 3-clause license. See the licenses folder for
 more information.
 
-
-Contributing
-------------
+## Contributing
 
 We love contributions! indiclient is open source,
 built on open source, and we'd love to have you hang out in our community.
@@ -50,7 +38,7 @@ a whole, because you're coming to the project with fresh eyes, so you can see
 the errors and assumptions that seasoned contributors have glossed over.
 
 Note: This disclaimer was originally written by
-`Adrienne Lowe <https://github.com/adriennefriend>`_ for a
-`PyCon talk <https://www.youtube.com/watch?v=6Uj746j9Heo>`_, and was adapted by
+[Adrienne Lowe](https://github.com/adriennefriend) for a
+[PyCon talk](https://www.youtube.com/watch?v=6Uj746j9Heo), and was adapted by
 indiclient based on its use in the README file for the
-`MetPy project <https://github.com/Unidata/MetPy>`_.
+[MetPy project](https://github.com/Unidata/MetPy).
