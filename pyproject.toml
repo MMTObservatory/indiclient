@@ -7,7 +7,7 @@ authors = [
 license = {file = "licenses/LICENSE.rst"}
 readme = "README.md"
 description = "Python interface to INDI protocol"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
     "astropy",
 ]
